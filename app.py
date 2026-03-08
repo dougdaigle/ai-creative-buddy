@@ -1,65 +1,136 @@
 import streamlit as st
-import os
 from google import genai
 from google.genai import types
 
-# --- 1. PREMIUM KIOSK STYLING ---
-st.set_page_config(page_title="Creative Buddy AI", layout="wide")
+# --- 1. PREMIUM KIOSK STYLING (UPDATED FOR DARK FONT) ---
+# We're moving from a simple style to a more rugged, "touchscreen-ready" kiosk feel.
+st.set_page_config(page_title="My Creative Buddy AI", layout="centered")
 
-# Custom CSS for a polished, "App-like" look
+# Custom CSS for that professional, kiosk-app feel
 st.markdown("""
     <style>
-    /* Import a friendly font */
-    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
-
-    html, body, [class*="css"]  {
-        font-family: 'Fredoka', sans-serif;
-    }
-
+    /* --- Main App Styling --- */
     .stApp {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
 
-    /* Hero Header Area */
-    .hero-text {
+    /* --- Centering and Styling Titles/Subtitles --- */
+    /* Target the main titles and subtitles to center them and use dark font */
+    h1, h2, h3, .stMarkdown p {
         text-align: center;
-        color: #1E3A8A;
-        padding: 20px;
+        color: #1a202c; /* A very dark, almost black, readable gray */
+        font-family: 'Inter', sans-serif; /* A clear, clean kiosk font */
     }
 
-    /* Huge Rounded Buttons */
-    div.stButton > button:first-child {
-        background-color: #ffffff;
-        color: #1E3A8A;
-        height: 8em;
-        width: 100%;
-        border-radius: 30px;
-        font-size: 24px;
-        font-weight: 600;
-        border: none;
-        box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+    /* Target specifically the main title on the landing page */
+    .css-k1v44b h1 {
+        margin-bottom: 0.5rem;
     }
 
-    div.stButton > button:hover {
-        transform: translateY(-5px);
-        box-shadow: 0px 15px 30px rgba(0,0,0,0.15);
-        background-color: #1E3A8A;
-        color: white;
+    /* --- Styling Input and Puzzles for the Kiosk --- */
+    /* Centering the instruction text */
+    div[data-testid="stMarkdownContainer"] {
+        text-align: center;
+        color: #1a202c;
     }
 
-    /* Styled Input Boxes */
+    /* Styling the Input Box */
     .stTextInput input {
         border-radius: 20px;
-        border: 2px solid #1E3A8A;
-        padding: 10px 20px;
+        border: 2px solid #1a202c;
+        text-align: center;
+        color: #1a202c;
     }
 
-    /* Hide technical UI elements */
+    /* Styling the Quiz/Puzzle Area with dark, clear font */
+    div.stAlert {
+        background-color: #f7fafc;
+        border: 2px solid #1a202c;
+        border-radius: 15px;
+        color: #1a202c; /* Making sure instructions are dark */
+    }
+    div.stAlert p {
+        color: #1a202c;
+    }
+
+    /* Styling the puzzle answer input for a kiosk feel */
+    .stNumberInput input {
+        border-radius: 15px;
+        border: 2px solid #1a202c;
+        text-align: center;
+        font-size: 24px;
+        color: #1a202c;
+    }
+
+    /* --- Making Buttons Massive & Fun --- */
+    /* We'll use Streamlit's primary buttons to make them really stand out on a kiosk screen */
+    div.stButton > button:first-child {
+        background-color: #f7fafc; /* Standard button color */
+        color: #1a202c; /* Make sure the standard button text is dark */
+        height: 6em;
+        width: 100%;
+        border-radius: 25px;
+        font-size: 20px;
+        font-weight: bold;
+        border: 2px solid #1a202c;
+        box-shadow: 0px 5px 10px rgba(0,0,0,0.1);
+        display: flex; /* Helps center vertically */
+        align-items: center; /* Center vertically */
+        justify-content: center; /* Center horizontally */
+        text-align: center;
+    }
+    
+    /* Style for our massive "START" primary buttons */
+    div.stButton > button.css-1f912p4 {
+        background-color: #1a202c; /* Kiosk Primary button color (Dark) */
+        color: white; /* Text color for dark button */
+        height: 10em;
+        width: 100%;
+        border-radius: 30px;
+        font-size: 32px;
+        border: none;
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
+    }
+
+    /* --- Custom Header Section (Updated for Dark Font) --- */
+    .custom-header {
+        text-align: center;
+        padding: 20px;
+        background-color: #ffffff; /* Make the header area pop against the background */
+        border-radius: 20px;
+        border: 3px solid #1a202c;
+        margin-bottom: 2rem;
+    }
+    .custom-header h1 {
+        color: #1a202c;
+        margin-bottom: 5px;
+    }
+    .custom-header p {
+        color: #1a202c;
+        font-style: italic;
+    }
+
+    /* --- Styling Success/Warning boxes (Updated for Dark Font) --- */
+    div.stSuccess {
+        background-color: #e6fffa;
+        color: #1a202c;
+        border: 2px solid #285e61;
+        border-radius: 15px;
+    }
+    div.stSuccess p {
+        color: #1a202c;
+    }
+    div.stWarning {
+        background-color: #fffaf0;
+        color: #1a202c;
+        border: 2px solid #744210;
+        border-radius: 15px;
+    }
+    div.stWarning p {
+        color: #1a202c;
+    }
+
+    /* Hide the top technical menu for an immersive kiosk feel */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -67,70 +138,91 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- 2. AI CLIENT SETUP ---
+# Securely accessing your secret API key
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=api_key)
 except Exception:
-    st.error("🔑 Please add GEMINI_API_KEY to your Secrets.")
+    st.error("🔑 Please add GEMINI_API_KEY to your Streamlit Secrets before deploying.")
     st.stop()
 
 # --- 3. APP HEADER ---
-st.markdown('<div class="hero-text"><h1>🤖 My Creative Buddy</h1><p>The AI Library Station</p></div>', unsafe_allow_html=True)
+# This is a custom HTML section for the title to make it look nicer on a kiosk
+st.markdown("""
+    <div class="custom-header">
+        <h1>🤖 My Creative Buddy</h1>
+        <p>The AI Library Station</p>
+    </div>
+    """, unsafe_allow_html=True)
 
+# --- 4. APP NAVIGATION LOGIC ---
 if 'mode' not in st.session_state:
     st.session_state.mode = None
 
-# --- 4. MAIN MENU (Centered Cards) ---
+# --- THE MAIN MENU ---
 if st.session_state.mode is None:
-    st.write("## Choose your adventure!")
-    # Use empty columns to center the buttons
-    _, col_mid, _ = st.columns([1, 4, 1])
-    
-    with col_mid:
-        c1, c2, c3 = st.columns(3)
-        with c1:
+    st.markdown("## Choose your creative adventure!")
+    st.write("Click a massive button to get started.")
+
+    # We use empty columns to center the buttons on the screen
+    _, mid_col, _ = st.columns([1, 4, 1])
+
+    with mid_col:
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            # Adding a "Start coloring!" specific function
             if st.button("🎨\nColoring\nPage"):
                 st.session_state.mode = "coloring"
-        with c2:
-            if st.button("📸\nCool\nCaricature"):
+        with col2:
+            # Adding a "Let's draw!" specific function
+            if st.button("📸\nFace\nCaricature"):
                 st.session_state.mode = "caricature"
-        with c3:
-            if st.button("💡\nFun\nFact"):
+        with col3:
+            # Adding a "What's the puzzle?" specific function
+            if st.button("💡\nDaily\nFact"):
                 st.session_state.mode = "fact"
 
-# --- 5. ACTIVITY: COLORING PAGE ---
+# --- ACTIVITY: COLORING PAGE ---
 if st.session_state.mode == "coloring":
-    _, center_col, _ = st.columns([1, 2, 1])
-    with center_col:
-        st.markdown("### 🎨 Create a Coloring Sheet")
-        prompt = st.text_input("What should the robot draw?", placeholder="e.g. A space dinosaur")
-        
-        if st.button("✨ GENERATE"):
-            with st.spinner("Drawing your masterpiece..."):
-                try:
-                    response = client.models.generate_content(
-                        model='gemini-3.1-flash-image-preview',
-                        contents=f"Kids coloring book page, black and white line art of {prompt}. Thick outlines, no shading, white background.",
-                        config=types.GenerateContentConfig(response_modalities=["IMAGE"])
-                    )
-                    for part in response.parts:
-                        if part.inline_data:
-                            st.image(part.as_image(), use_container_width=True)
-                            st.success("Tada! Ready to print.")
-                            st.button("🖨️ SEND TO PRINTER")
-                except Exception as e:
-                    st.error("The robot is resting. Try a different idea!")
+    st.divider()
+    # Adding a clean, centered kiosk input field
+    prompt = st.text_input("What should the AI draw?", placeholder="e.g. A cat on the moon...")
+    
+    if st.button("CREATE MASTERPIECE", key="gen_color"):
+        with st.spinner("🎨 Your robot buddy is drawing..."):
+            try:
+                # March 2026 Model Name & Image Configuration
+                response = client.models.generate_content(
+                    model='gemini-3.1-flash-image-preview',
+                    contents=f"Kids coloring book page, black and white line art of {prompt}. Thick outlines, no shading, white background.",
+                    config=types.GenerateContentConfig(response_modalities=["IMAGE"])
+                )
+                
+                # Use the new 2026 as_image() method to convert the AI output directly for Streamlit
+                for part in response.parts:
+                    if part.inline_data:
+                        st.image(part.as_image(), use_container_width=True, caption=f"Coloring sheet: {prompt}")
+                        st.success(" Ready to print!")
+                        # This button would connect to your kiosk printer script
+                        st.button("🖨️ SEND TO PRINTER")
+            
+            except Exception as e:
+                st.error("The robot is resting. Try a different idea!")
+                st.write(f"Technical Log: {str(e)}")
 
-# --- 6. ACTIVITY: FUN FACT ---
+# --- ACTIVITY: FUN FACT ---
 elif st.session_state.mode == "fact":
-    _, center_col, _ = st.columns([1, 2, 1])
-    with center_col:
-        st.markdown("### 💡 Today's Fun Facts")
-        st.info("**On This Day (March 8):** International Women's Day!")
-        st.success("**Animal Fact:** A snail can sleep for three years!")
-        st.button("🖨️ PRINT FACT STRIP")
+    st.divider()
+    # Simple logic for 'On This Day'
+    st.write("### 📅 On This Day: March 8th")
+    st.info("**International Women's Day:** Celebrated worldwide to honor women's achievements.")
+    st.write("---")
+    st.write("### Weird Animal Facts")
+    st.success("**The Snail:** Did you know a snail can sleep for three years?")
+    st.button("🖨️ PRINT FACT STRIP")
 
-# --- 7. HOME BUTTON ---
+# --- HOME BUTTON ---
+# This button needs to be clear to reset the kiosk for the next user.
 if st.session_state.mode is not None:
     st.write("---")
     if st.button("🏠 BACK TO MENU"):
