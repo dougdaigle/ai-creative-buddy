@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import time
 
-# --- 1. IPAD STYLING: THE FINAL KIOSK DESIGN ---
+# --- 1. IPAD STYLING: FLOATING BACK BUTTON & KIOSK THEME ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
@@ -10,18 +10,36 @@ st.markdown("""
     /* Full Sky Blue Background */
     .stApp { background-color: #00BFFF; }
     
+    /* THE FLOATING BACK BUTTON: Fixed to Top-Left */
+    .floating-back {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: white !important;
+        color: black !important;
+        text-decoration: none !important;
+        padding: 10px 20px;
+        font-size: 35px !important;
+        font-weight: 900 !important;
+        border-radius: 20px;
+        border: 5px solid #1a202c;
+        box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+        z-index: 1000;
+        font-family: 'Arial Black', sans-serif;
+    }
+
     .kiosk-title {
         color: white;
         text-align: center;
         font-size: 50px !important;
         font-weight: 900;
-        margin-top: 10px;
+        margin-top: 20px;
         margin-bottom: 35px;
         font-family: 'Arial Black', sans-serif;
         text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
     }
 
-    /* THE UNIVERSAL KIOSK BUTTON: Identical across all pages */
+    /* THE UNIVERSAL KIOSK BUTTON */
     .kiosk-link {
         display: flex;
         align-items: center;
@@ -48,12 +66,7 @@ st.markdown("""
         flex-shrink: 0;
     }
 
-    .kiosk-link:active {
-        background-color: #E0E0E0 !important;
-        transform: scale(0.98);
-    }
-    
-    /* UI Cleanup */
+    /* UI Cleanup: Hiding everything standard */
     header, footer, #MainMenu, [data-testid="stHeader"] {visibility: hidden; display: none;}
     
     .instruction-text {
@@ -65,7 +78,6 @@ st.markdown("""
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
-    /* Worksheet Frame */
     .worksheet-preview {
         background-color: white;
         padding: 15px;
@@ -75,7 +87,6 @@ st.markdown("""
         box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
     }
     
-    /* Answer Box for Math/Puzzle */
     .answer-box {
         background-color: #FFF;
         color: #1E3A8A;
@@ -95,7 +106,11 @@ mode = params.get("mode", None)
 animal = params.get("animal", None)
 action = params.get("action", None)
 
-# --- 3. HOME PAGE ---
+# --- 3. FLOATING BACK BUTTON (Shows only when NOT on Home) ---
+if mode is not None:
+    st.markdown('<a href="/" class="floating-back" target="_self">🏠 BACK</a>', unsafe_allow_html=True)
+
+# --- 4. HOME PAGE ---
 if mode is None:
     st.markdown('<div class="kiosk-title">Current choice:</div>', unsafe_allow_html=True)
     st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self"><span class="btn-icon">🎨</span> A. Color Sheet Maker</a>', unsafe_allow_html=True)
@@ -103,7 +118,7 @@ if mode is None:
     st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">💡</span> C. Fun Fact</a>', unsafe_allow_html=True)
     st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self"><span class="btn-icon">➕</span> D. Math Magic</a>', unsafe_allow_html=True)
 
-# --- 4. OPTION A: COLOR SHEET MAKER ---
+# --- 5. OPTION A: COLOR SHEET MAKER ---
 elif mode == "coloring":
     if animal is None:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
@@ -112,61 +127,39 @@ elif mode == "coloring":
         st.markdown('<a href="/?mode=coloring&animal=Giraffe" class="kiosk-link" target="_self"><span class="btn-icon">🦒</span> GIRAFFE</a>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="instruction-text">{animal} Worksheet</div>', unsafe_allow_html=True)
-        
-        # Static demo images
         animal_imgs = {
             "Lion": "http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_0",
             "Elephant": "http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_2",
             "Giraffe": "https://img.icons8.com/ios/500/giraffe.png"
         }
-        
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
         st.image(animal_imgs[animal], use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
-        
         st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
-        
         if action == "print":
             st.toast("🖨️ Sending to printer...", icon="🤖")
-            time.sleep(1)
-            st.success("Success! Pick it up at the desk.")
 
-# --- 5. OPTION B: TODAY'S PUZZLE ---
+# --- 6. OPTION B: TODAY'S PUZZLE ---
 elif mode == "puzzle":
     st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
-    
     riddle_text = "What has hands but cannot clap?"
     answer_text = "Answer: A Clock! ⏰"
-    
     st.markdown(f'<div class="answer-box">{riddle_text}</div>', unsafe_allow_html=True)
-    
     if action == "reveal":
         st.markdown(f'<div class="answer-box" style="background-color:#FFD700;">{answer_text}</div>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=puzzle&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT RIDDLE</a>', unsafe_allow_html=True)
     else:
         st.markdown('<a href="/?mode=puzzle&action=reveal" class="kiosk-link" target="_self"><span class="btn-icon">🔍</span> SHOW ANSWER</a>', unsafe_allow_html=True)
-    
-    if action == "print":
-        st.toast("Printing riddle card...", icon="🧩")
 
-# --- 6. OPTION D: MATH MAGIC ---
+# --- 7. OPTION D: MATH MAGIC ---
 elif mode == "math":
     st.markdown('<div class="instruction-text">➕ Math Magic!</div>', unsafe_allow_html=True)
     st.markdown('<div class="kiosk-title" style="font-size:80px !important;">5 + 5 = ?</div>', unsafe_allow_html=True)
-    
     if action == "reveal":
         st.markdown('<div class="kiosk-title" style="font-size:100px !important; color:#FFD700;">10! 🌟</div>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self"><span class="btn-icon">🎲</span> NEW PROBLEM</a>', unsafe_allow_html=True)
     else:
         st.markdown('<a href="/?mode=math&action=reveal" class="kiosk-link" target="_self"><span class="btn-icon">🤔</span> CHECK ANSWER</a>', unsafe_allow_html=True)
 
-# --- 7. OPTION C: FUN FACT ---
+# --- 8. OPTION C: FUN FACT ---
 elif mode == "fact":
     st.markdown('<div class="instruction-text">💡 Fun Fact!</div>', unsafe_allow_html=True)
     st.markdown('<div class="answer-box">Octopuses have three hearts! 🐙</div>', unsafe_allow_html=True)
-    st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">🌟</span> NEXT FACT</a>', unsafe_allow_html=True)
-
-# --- UNIVERSAL BACK BUTTON ---
-if mode is not None:
-    st.write("")
-    st.markdown('<a href="/" class="kiosk-link" target="_self"><span class="btn-icon">🏠</span> BACK TO MENU</a>', unsafe_allow_html=True)
