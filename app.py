@@ -77,7 +77,7 @@ st.markdown("""
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
-    /* WORKSHEET PREVIEW FRAME: Matches the physical kiosk paper output */
+    /* WORKSHEET PREVIEW FRAME */
     .worksheet-preview {
         background-color: white;
         padding: 30px;
@@ -104,13 +104,13 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. NAVIGATION LOGIC (Query Params handle the routing) ---
+# --- 2. NAVIGATION LOGIC ---
 params = st.query_params
 mode = params.get("mode")
 animal = params.get("animal")
 action = params.get("action")
 
-# --- 3. FLOATING BACK BUTTON (Functional and Persistent) ---
+# --- 3. FLOATING BACK BUTTON ---
 if mode:
     st.markdown('<a href="/" class="floating-back" target="_self">🏠 BACK</a>', unsafe_allow_html=True)
 
@@ -126,30 +126,36 @@ if not mode:
 elif mode == "coloring":
     if not animal:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
+        # Expanded Animal List
         st.markdown('<a href="/?mode=coloring&animal=Lion" class="kiosk-link" target="_self"><span class="btn-icon">🦁</span> LION</a>', unsafe_allow_html=True)
         st.markdown('<a href="/?mode=coloring&animal=Elephant" class="kiosk-link" target="_self"><span class="btn-icon">🐘</span> ELEPHANT</a>', unsafe_allow_html=True)
         st.markdown('<a href="/?mode=coloring&animal=Giraffe" class="kiosk-link" target="_self"><span class="btn-icon">🦒</span> GIRAFFE</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Zebra" class="kiosk-link" target="_self"><span class="btn-icon">🦓</span> ZEBRA</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Monkey" class="kiosk-link" target="_self"><span class="btn-icon">🐒</span> MONKEY</a>', unsafe_allow_html=True)
     else:
         # Title updated to [Animal Name] Color Sheet
         st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
         # Mapping for Animal Coloring Worksheets
         animal_imgs = {
-            "Lion": "http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_0",
-            "Elephant": "http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_2",
-            "Giraffe": "https://img.icons8.com/ios/500/giraffe.png"
+            "Lion": "https://img.icons8.com/ios/500/lion.png",
+            "Elephant": "https://img.icons8.com/ios/500/elephant.png",
+            "Giraffe": "https://img.icons8.com/ios/500/giraffe.png",
+            "Zebra": "https://img.icons8.com/ios/500/zebra.png",
+            "Monkey": "https://img.icons8.com/ios/500/monkey.png"
         }
         
         # The Worksheet Preview Box
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        st.image(animal_imgs[animal], use_container_width=True)
+        if animal in animal_imgs:
+            st.image(animal_imgs[animal], use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
         
         if action == "print":
             st.toast("🖨️ Sending to printer...", icon="🤖")
-            st.success("Success! Pick up your page at the desk.")
+            st.success(f"Success! {animal} page is printing.")
 
 # --- 6. OPTION B: TODAY'S PUZZLE ---
 elif mode == "puzzle":
