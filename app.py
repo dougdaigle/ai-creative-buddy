@@ -23,6 +23,7 @@ st.markdown("""
     .stSuccess, .stInfo, .stWarning { border-radius: 15px; border: 2px solid #1E3A8A; }
     header {visibility: hidden;}
     footer {visibility: hidden;}
+    #MainMenu {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -31,7 +32,7 @@ try:
     api_key = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=api_key)
 except Exception:
-    st.error("🔑 API Key Missing!")
+    st.error("🔑 API Key Missing! Check Streamlit Secrets.")
     st.stop()
 
 # --- 3. SESSION STATE ---
@@ -43,25 +44,19 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 if st.session_state.mode is None:
     st.title("🤖 My Creative Buddy!")
     st.write("### Choose an activity:")
-    
-    # 2x2 Grid for iPad
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🎨 Coloring Page", use_container_width=True): 
-            st.session_state.mode = "coloring"
-            st.rerun()
+            st.session_state.mode = "coloring"; st.rerun()
         if st.button("🧩 Today's Puzzle", use_container_width=True): 
-            st.session_state.mode = "puzzle"
-            st.rerun()
+            st.session_state.mode = "puzzle"; st.rerun()
     with col2:
         if st.button("💡 Fun Fact", use_container_width=True): 
-            st.session_state.mode = "fact"
-            st.rerun()
+            st.session_state.mode = "fact"; st.rerun()
         if st.button("➕ Math Magic", use_container_width=True): 
-            st.session_state.mode = "math"
-            st.rerun()
+            st.session_state.mode = "math"; st.rerun()
 
-# --- 5. ACTIVITY: COLORING PAGE (KEEPING SAME) ---
+# --- 5. ACTIVITY: COLORING PAGE ---
 elif st.session_state.mode == "coloring":
     if st.session_state.selected_char is None:
         st.write("## 1. Pick a Friend!")
@@ -92,56 +87,64 @@ elif st.session_state.mode == "coloring":
                         if part.inline_data:
                             st.image(part.as_image(), use_container_width=True)
                             st.button("🖨️ PRINT NOW", use_container_width=True)
-                except Exception: st.error("Robot is busy!")
+                except Exception:
+                    st.warning("💤 The robot is taking a nap. Try again in 1 minute!")
+                    if st.button("🏠 Start Over"):
+                        st.session_state.mode = None; st.rerun()
 
-# --- 6. ACTIVITY: TODAY'S PUZZLE ---
+# --- 6. ACTIVITY: TODAY'S PUZZLE (FIXED ERROR HANDLING) ---
 elif st.session_state.mode == "puzzle":
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
         with st.spinner("Thinking..."):
-            prompt = "Write a very simple riddle for an elementary student. Give the riddle first, then hide the answer far below."
-            response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
-            st.info(response.text)
-            st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
+            try:
+                prompt = "Write a very simple riddle for an elementary student. Give the riddle first, then hide the answer far below."
+                response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
+                st.info(response.text)
+                st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
+            except Exception:
+                # Standard Busy Error Message instead of Traceback
+                st.warning("💤 The robot is busy right now! Please wait a moment.")
+                if st.button("🏠 Start Over"):
+                    st.session_state.mode = None; st.rerun()
 
 # --- 7. ACTIVITY: MATH MAGIC ---
 elif st.session_state.mode == "math":
     st.write("## ➕ Math Magic!")
     topic = st.radio("Choose a topic:", ["Counting", "Addition", "Subtraction"], horizontal=True)
-    
     if st.button("📝 GENERATE PROBLEM", use_container_width=True):
         num1, num2 = random.randint(1, 10), random.randint(1, 10)
         if topic == "Counting":
             st.session_state.math_problem = {"q": f"Count the stars: {'⭐' * num1}", "a": num1}
         elif topic == "Addition":
             st.session_state.math_problem = {"q": f"What is {num1} + {num2}?", "a": num1 + num2}
-        else: # Subtraction
+        else:
             high, low = max(num1, num2), min(num1, num2)
             st.session_state.math_problem = {"q": f"What is {high} - {low}?", "a": high - low}
-
     if st.session_state.math_problem:
         st.write(f"### {st.session_state.math_problem['q']}")
         user_ans = st.number_input("Your Answer:", min_value=0, step=1)
         if st.button("✅ CHECK ANSWER", use_container_width=True):
             if user_ans == st.session_state.math_problem['a']:
                 st.success("🌟 AMAZING! You got it right!")
-                st.button("🖨️ PRINT CERTIFICATE", use_container_width=True)
             else:
                 st.warning("Try again! You can do it!")
 
-# --- 8. ACTIVITY: FUN FACT (SAME) ---
+# --- 8. ACTIVITY: FUN FACT ---
 elif st.session_state.mode == "fact":
     st.write("## 💡 Learning Time!")
     if st.button("🌟 GENERATE SURPRISE", use_container_width=True):
-        prompt = "One fun fact for today's date and one weird animal fact for kids. Emojis only!"
-        response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
-        st.success(response.text)
-        st.button("🖨️ PRINT FACT STRIP", use_container_width=True)
+        try:
+            prompt = "One fun fact for today's date and one weird animal fact for kids. Use emojis!"
+            response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
+            st.success(response.text)
+        except Exception:
+            st.warning("💤 Robot is busy! Try again soon.")
 
 # --- 9. HOME BUTTON ---
 if st.session_state.mode:
     st.write("---")
-    if st.button("🏠 START OVER", use_container_width=True):
+    if st.button("🏠 START OVER", use_container_width=True, key="main_reset"):
         st.session_state.mode = None
         st.session_state.selected_char = None
         st.session_state.math_problem = None
