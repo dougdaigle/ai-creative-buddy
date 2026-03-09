@@ -1,11 +1,32 @@
 import streamlit as st
 from google import genai
 from google.genai import types
+from streamlit_lottie import st_lottie
+import requests
 import datetime
 import random
+import base64
 
-# --- 1. IPAD STYLING ---
+# --- 1. IPAD STYLING & SOUND SETUP ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
+
+def play_sound(sound_url):
+    """Helper to play a success sound automatically"""
+    sound_html = f"""
+        <audio autoplay>
+            <source src="{sound_url}" type="audio/mp3">
+        </audio>
+    """
+    st.markdown(sound_html, unsafe_allow_html=True)
+
+def load_lottie(url):
+    r = requests.get(url)
+    if r.status_code != 200: return None
+    return r.json()
+
+# Load a fun celebration animation
+confetti_url = "https://assets5.lottiefiles.com/packages/lf20_u4yrau.json"
+lottie_celebration = load_lottie(confetti_url)
 
 st.markdown("""
     <style>
@@ -20,7 +41,6 @@ st.markdown("""
         font-size: 20px !important;
         height: 80px !important;
     }
-    .stSuccess, .stInfo, .stWarning { border-radius: 15px; border: 2px solid #1E3A8A; }
     header {visibility: hidden;}
     footer {visibility: hidden;}
     #MainMenu {visibility: hidden;}
@@ -32,7 +52,7 @@ try:
     api_key = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=api_key)
 except Exception:
-    st.error("🔑 API Key Missing! Check Streamlit Secrets.")
+    st.error("🔑 API Key Missing!")
     st.stop()
 
 # --- 3. SESSION STATE ---
@@ -90,21 +110,19 @@ elif st.session_state.mode == "coloring":
                 except Exception:
                     st.warning("💤 The robot is taking a nap. Try again in 1 minute!")
 
-# --- 6. ACTIVITY: TODAY'S PUZZLE (CLEAN ERROR HANDLING) ---
+# --- 6. ACTIVITY: TODAY'S PUZZLE ---
 elif st.session_state.mode == "puzzle":
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
         with st.spinner("Thinking..."):
             try:
-                prompt = "Write a very simple riddle for an elementary student. Give the riddle first, then hide the answer far below."
+                prompt = "Write a very simple riddle for an elementary student. Emojis included!"
                 response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
                 st.info(response.text)
-                st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
             except Exception:
-                # Friendly error message only
-                st.warning("💤 The robot is busy right now! Please wait a moment.")
+                st.warning("💤 The robot is busy right now!")
 
-# --- 7. ACTIVITY: MATH MAGIC ---
+# --- 7. ACTIVITY: MATH MAGIC (WITH CELEBRATION) ---
 elif st.session_state.mode == "math":
     st.write("## ➕ Math Magic!")
     topic = st.radio("Choose a topic:", ["Counting", "Addition", "Subtraction"], horizontal=True)
@@ -117,11 +135,15 @@ elif st.session_state.mode == "math":
         else:
             high, low = max(num1, num2), min(num1, num2)
             st.session_state.math_problem = {"q": f"What is {high} - {low}?", "a": high - low}
+
     if st.session_state.math_problem:
         st.write(f"### {st.session_state.math_problem['q']}")
         user_ans = st.number_input("Your Answer:", min_value=0, step=1)
         if st.button("✅ CHECK ANSWER", use_container_width=True):
             if user_ans == st.session_state.math_problem['a']:
+                # PLAY SOUND AND ANIMATION
+                play_sound("https://www.myinstants.com/media/sounds/level-up-video-game-sound-effect-hd.mp3")
+                st_lottie(lottie_celebration, height=200, key="success_anim")
                 st.success("🌟 AMAZING! You got it right!")
             else:
                 st.warning("Try again! You can do it!")
@@ -131,13 +153,13 @@ elif st.session_state.mode == "fact":
     st.write("## 💡 Learning Time!")
     if st.button("🌟 GENERATE SURPRISE", use_container_width=True):
         try:
-            prompt = "One fun fact for today's date and one weird animal fact for kids. Use emojis!"
+            prompt = "One fun fact for today and one weird animal fact for kids."
             response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
             st.success(response.text)
         except Exception:
-            st.warning("💤 Robot is busy! Try again soon.")
+            st.warning("💤 Robot is busy!")
 
-# --- 9. LARGE HOME BUTTON ---
+# --- 9. HOME BUTTON ---
 if st.session_state.mode:
     st.write("---")
     if st.button("🏠 START OVER", use_container_width=True, key="main_reset"):
