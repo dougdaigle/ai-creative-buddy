@@ -2,12 +2,11 @@ import streamlit as st
 import random
 import os
 
-# --- 1. IPAD STYLING: PERSISTENT SKY BLUE THEME ---
+# --- 1. IPAD STYLING: SKY BLUE & ICON BUTTONS ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
     <style>
-    /* Sky Blue Background across all pages */
     .stApp { background-color: #00BFFF; }
     
     .kiosk-title {
@@ -21,49 +20,48 @@ st.markdown("""
         text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
     }
 
-    /* THE KIOSK BUTTON: Black Text on White, Massive Font */
-    div.stButton > button, .kiosk-link {
-        display: block;
+    /* THE ICON BUTTON: Black Text, Giant Emojis, Massive Font */
+    .kiosk-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background-color: white !important;
         color: black !important;
         text-decoration: none !important;
-        text-align: center;
-        line-height: 1.2;
         padding: 20px;
-        font-size: 50px !important;
+        font-size: 48px !important; /* Large readable font */
         font-weight: 900 !important;
         min-height: 160px !important;
         width: 100% !important;
-        border-radius: 40px;
+        border-radius: 45px;
         border: 8px solid #1a202c;
         margin-bottom: 30px;
-        box-shadow: 0px 10px 20px rgba(0,0,0,0.4);
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.4);
         font-family: 'Arial Black', sans-serif;
     }
 
-    /* Smaller button override for sub-selections like "Dino" */
-    .sub-btn div.stButton > button {
-        min-height: 100px !important;
-        font-size: 30px !important;
+    /* Styling the Icon specifically to be extra large */
+    .btn-icon {
+        font-size: 75px; 
+        margin-right: 25px;
     }
 
-    /* White text for activity labels/instructions */
+    .kiosk-link:active {
+        background-color: #E0E0E0 !important;
+        transform: scale(0.98);
+    }
+    
+    header, footer, #MainMenu, [data-testid="stHeader"] {visibility: hidden; display: none;}
+    
     .instruction-text {
         color: white;
         text-align: center;
         font-size: 35px;
         font-weight: 900;
-        margin-bottom: 20px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
-    /* Clean Kiosk UI */
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    #MainMenu {visibility: hidden;}
-    [data-testid="stHeader"] {display: none;}
-    
-    /* Center images on the blue background */
+    /* Frame for the coloring sheets */
     [data-testid="stImage"] {
         background-color: white;
         padding: 15px;
@@ -76,80 +74,48 @@ st.markdown("""
 # --- 2. SESSION STATE ---
 if 'mode' not in st.session_state: st.session_state.mode = None
 if 'selected_char' not in st.session_state: st.session_state.selected_char = None
-if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 3. MAIN MENU (HOME PAGE) ---
 if st.session_state.mode is None:
     st.markdown('<div class="kiosk-title">Choose an activity:</div>', unsafe_allow_html=True)
     
-    # Custom HTML buttons for the main menu to ensure black text visibility
-    c1 = st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self">A. Color Sheet Maker</a>', unsafe_allow_html=True)
-    c2 = st.markdown('<a href="/?mode=puzzle" class="kiosk-link" target="_self">B. Today\'s Puzzle</a>', unsafe_allow_html=True)
-    c3 = st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self">C. Fun Fact</a>', unsafe_allow_html=True)
-    c4 = st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self">D. Math Magic</a>', unsafe_allow_html=True)
+    # HTML Buttons with Giant Icons
+    st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self"><span class="btn-icon">🎨</span> A. Color Sheet Maker</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=puzzle" class="kiosk-link" target="_self"><span class="btn-icon">🧩</span> B. Today\'s Puzzle</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">💡</span> C. Fun Fact</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self"><span class="btn-icon">➕</span> D. Math Magic</a>', unsafe_allow_html=True)
 
     if "mode" in st.query_params:
         st.session_state.mode = st.query_params["mode"]
         st.query_params.clear()
         st.rerun()
 
-# --- 4. ACTIVITY PAGES (SKY BLUE PERSISTENT) ---
+# --- 4. ACTIVITY PAGES ---
 else:
-    # --- COLORING PAGE ---
     if st.session_state.mode == "coloring":
-        if st.session_state.selected_char is None:
-            st.markdown('<div class="instruction-text">1. Pick a Friend!</div>', unsafe_allow_html=True)
-            st.markdown('<div class="sub-btn">', unsafe_allow_html=True)
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                if st.button("🦖 DINOSAUR", use_container_width=True): st.session_state.selected_char = "dinosaur"; st.rerun()
-            with col2:
-                if st.button("🚀 ASTRO", use_container_width=True): st.session_state.selected_char = "astronaut"; st.rerun()
-            with col3:
-                if st.button("🦄 MAGIC", use_container_width=True): st.session_state.selected_char = "unicorn"; st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            st.markdown(f'<div class="instruction-text">Showing your {st.session_state.selected_char}!</div>', unsafe_allow_html=True)
-            arts = {
-                "dinosaur": ["https://img.icons8.com/ios/500/dinosaur.png", "https://img.icons8.com/ios-filled/500/dinosaur.png", "https://img.icons8.com/external-flatart-icons-outline-flatarticons/500/external-dinosaur-dinosaur-flatart-icons-outline-flatarticons.png"],
-                "astronaut": ["https://img.icons8.com/ios/500/astronaut-helmet.png", "https://img.icons8.com/ios-filled/500/astronaut-helmet.png", "https://img.icons8.com/external-outline-juicy-fish/500/external-astronaut-space-exploration-outline-outline-juicy-fish.png"],
-                "unicorn": ["https://img.icons8.com/ios/500/unicorn.png", "https://img.icons8.com/ios-filled/500/unicorn.png", "https://img.icons8.com/external-outline-lafs/500/external-unicorn-fantasy-and-magic-outline-lafs.png"]
-            }
-            st.image(random.choice(arts[st.session_state.selected_char]), use_container_width=True)
-            if st.button("🖨️ PRINT NOW", use_container_width=True): st.success("Printing...")
+        st.markdown('<div class="instruction-text">Pick an animal to color!</div>', unsafe_allow_html=True)
+        # Animal Selection for Demo
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image("http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_0", caption="Lion", use_container_width=True)
+            if st.button("Choose Lion", use_container_width=True): st.success("Printing Lion Page..."); st.rerun()
+        with col2:
+            st.image("http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_2", caption="Elephant", use_container_width=True)
+            if st.button("Choose Elephant", use_container_width=True): st.success("Printing Elephant Page..."); st.rerun()
 
-    # --- TODAY'S PUZZLE ---
     elif st.session_state.mode == "puzzle":
         st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
-        riddles = [
-            "What has hands but cannot clap? \n\n**Answer:** A Clock! ⏰",
-            "What has to be broken before you can use it? \n\n**Answer:** An Egg! 🥚"
-        ]
-        st.info(random.choice(riddles))
-        if st.button("🎲 NEW RIDDLE", use_container_width=True): st.rerun()
+        st.info("What has hands but cannot clap? \n\n**Answer:** A Clock! ⏰")
 
-    # --- MATH MAGIC ---
     elif st.session_state.mode == "math":
-        st.markdown('<div class="instruction-text">➕ Math Magic!</div>', unsafe_allow_html=True)
-        if st.session_state.math_problem is None:
-            n1, n2 = random.randint(1, 10), random.randint(1, 10)
-            st.session_state.math_problem = {"q": f"{n1} + {n2} =", "a": n1 + n2}
-        
-        st.markdown(f'<div class="kiosk-title">{st.session_state.math_problem["q"]} ?</div>', unsafe_allow_html=True)
-        if st.button("🌟 SHOW ANSWER", use_container_width=True):
-            st.success(f"The answer is {st.session_state.math_problem['a']}! 🌟")
+        st.markdown('<div class="kiosk-title">5 + 5 = ?</div>', unsafe_allow_html=True)
+        if st.button("🌟 SHOW ANSWER", use_container_width=True): st.success("The answer is 10! 🌟")
 
-    # --- FUN FACT ---
     elif st.session_state.mode == "fact":
         st.markdown('<div class="instruction-text">💡 Fun Fact!</div>', unsafe_allow_html=True)
-        facts = ["Octopuses have three hearts! 🐙", "Honey never spoils! 🍯"]
-        st.success(random.choice(facts))
-        if st.button("🌟 NEXT FACT", use_container_width=True): st.rerun()
+        st.success("Octopuses have three hearts! 🐙")
 
-    # --- UNIVERSAL BACK BUTTON ---
     st.write("---")
     if st.button("🏠 BACK TO MENU", use_container_width=True):
         st.session_state.mode = None
-        st.session_state.selected_char = None
-        st.session_state.math_problem = None
         st.rerun()
