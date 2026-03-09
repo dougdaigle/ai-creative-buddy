@@ -1,6 +1,4 @@
 import streamlit as st
-from google import genai
-from google.genai import types
 import datetime
 import random
 import os
@@ -12,7 +10,7 @@ st.markdown("""
     <style>
     .stApp { background-color: #F8FAFF; }
     
-    /* THE ORIGINAL SPIN ANIMATION */
+    /* THE SPIN ANIMATION */
     @keyframes logo-spin {
         0% { transform: rotate(0deg); }
         10% { transform: rotate(360deg); } 
@@ -61,20 +59,12 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. AI CLIENT SETUP ---
-try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-    client = genai.Client(api_key=api_key)
-except Exception:
-    st.error("🔑 API Key Missing!")
-    st.stop()
-
-# --- 3. SESSION STATE ---
+# --- 2. SESSION STATE ---
 if 'mode' not in st.session_state: st.session_state.mode = None
 if 'selected_char' not in st.session_state: st.session_state.selected_char = None
 if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
-# --- 4. MAIN MENU ---
+# --- 3. MAIN MENU ---
 if st.session_state.mode is None:
     if os.path.exists("logo.png"):
         _, mid, _ = st.columns([0.5, 5, 0.5])
@@ -96,11 +86,9 @@ if st.session_state.mode is None:
         if st.button("➕ Math Magic", use_container_width=True): 
             st.session_state.mode = "math"; st.rerun()
 
-# --- 5. ACTIVITY: COLORING PAGE (DEMO MODE) ---
+# --- 4. ACTIVITY: COLORING PAGE (STATIC DEMO) ---
 elif st.session_state.mode == "coloring":
-    # Disable pulsing for child-selection buttons
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
-    
     if st.session_state.selected_char is None:
         st.write("## 1. Pick a Friend!")
         c1, c2, c3 = st.columns(3)
@@ -118,7 +106,6 @@ elif st.session_state.mode == "coloring":
                 st.session_state.selected_char = "unicorn"; st.rerun()
     else:
         st.markdown(f"### Ready to see your **{st.session_state.selected_char.upper()}**?")
-        
         if st.button("✨ SHOW MY PAGE ✨", use_container_width=True):
             with st.spinner("Drawing..."):
                 demo_images = {
@@ -129,20 +116,15 @@ elif st.session_state.mode == "coloring":
                 st.image(demo_images[st.session_state.selected_char], use_container_width=True)
                 st.button("🖨️ PRINT NOW", use_container_width=True)
 
-# --- 6. ACTIVITY: TODAY'S PUZZLE ---
+# --- 5. ACTIVITY: TODAY'S PUZZLE (STATIC DEMO) ---
 elif st.session_state.mode == "puzzle":
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
-        with st.spinner("Thinking..."):
-            try:
-                prompt = "Write a simple riddle for a child."
-                response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
-                st.info(response.text)
-            except Exception:
-                st.warning("💤 The robot is busy!")
+        st.info("### Riddle:\nI have keys, but no locks. I have a space, but no room. You can enter, but never leave. What am I?\n\n\n\n**Answer:** A Keyboard! ⌨️")
+        st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
 
-# --- 7. ACTIVITY: MATH MAGIC ---
+# --- 6. ACTIVITY: MATH MAGIC (STILL LIVE LOGIC) ---
 elif st.session_state.mode == "math":
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## ➕ Math Magic!")
@@ -161,23 +143,19 @@ elif st.session_state.mode == "math":
         user_ans = st.number_input("Answer:", min_value=0, step=1)
         if st.button("✅ CHECK", use_container_width=True):
             if user_ans == st.session_state.math_problem['a']:
-                st.success("🌟 Amazing!")
+                st.success("🌟 Amazing! You got it!")
             else:
                 st.warning("Try again!")
 
-# --- 8. ACTIVITY: FUN FACT ---
+# --- 7. ACTIVITY: FUN FACT (STATIC DEMO) ---
 elif st.session_state.mode == "fact":
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## 💡 Learning Time!")
     if st.button("🌟 SURPRISE ME", use_container_width=True):
-        try:
-            prompt = "One fun fact for kids."
-            response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
-            st.success(response.text)
-        except Exception:
-            st.warning("💤 Robot is busy!")
+        st.success("### Did you know?\n\nA group of flamingos is called a **flamboyance**! 🦩✨")
+        st.button("🖨️ PRINT FACT STRIP", use_container_width=True)
 
-# --- 9. HOME BUTTON ---
+# --- 8. HOME BUTTON ---
 if st.session_state.mode:
     st.write("---")
     if st.button("🏠 START OVER", use_container_width=True):
