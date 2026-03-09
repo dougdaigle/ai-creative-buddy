@@ -10,7 +10,20 @@ st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 st.markdown("""
     <style>
     .stApp { background-color: #F0F5FF; }
-    h1, h2, h3 { color: #1E3A8A; text-align: center; }
+    h1 { color: #1E3A8A; text-align: center; margin-bottom: 0px; }
+    
+    /* Creative Slogan Styling */
+    .slogan {
+        text-align: center;
+        color: #4A90E2;
+        font-size: 20px;
+        font-style: italic;
+        font-weight: bold;
+        margin-top: -10px;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+    }
+
     div.stButton > button {
         border-radius: 20px;
         border: 3px solid #1E3A8A;
@@ -42,17 +55,16 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 # --- 4. MAIN MENU ---
 if st.session_state.mode is None:
     st.title("🤖 My Creative Buddy")
-    st.write("### AI Exploration for Kids") # Your New Slogan
+    # Creative Slogan Integration
+    st.markdown('<p class="slogan">✨ AI Exploration for Kids ✨</p>', unsafe_allow_html=True)
     
-    # 5-Button Layout
+    st.write("### Choose an activity:")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🎨 Coloring Page", use_container_width=True): 
             st.session_state.mode = "coloring"; st.rerun()
         if st.button("🧩 Today's Puzzle", use_container_width=True): 
             st.session_state.mode = "puzzle"; st.rerun()
-        if st.button("📖 Story Starter", use_container_width=True): 
-            st.session_state.mode = "story"; st.rerun()
     with col2:
         if st.button("💡 Fun Fact", use_container_width=True): 
             st.session_state.mode = "fact"; st.rerun()
@@ -93,21 +105,7 @@ elif st.session_state.mode == "coloring":
                 except Exception:
                     st.warning("💤 The robot is taking a nap. Try again in 1 minute!")
 
-# --- 6. ACTIVITY: STORY STARTER ---
-elif st.session_state.mode == "story":
-    st.write("## 📖 Start Your Adventure")
-    topic = st.text_input("What should the story be about?", placeholder="Ex: A talking taco...")
-    if st.button("✨ WRITE THE START", use_container_width=True):
-        with st.spinner("Thinking of a story..."):
-            try:
-                prompt = f"Write the first 3 sentences of a fun story about {topic} for a child. End with 'What happens next?'"
-                response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
-                st.info(response.text)
-                st.button("🖨️ PRINT STORY SHEET", use_container_width=True)
-            except Exception:
-                st.warning("💤 The robot is busy!")
-
-# --- 7. ACTIVITY: TODAY'S PUZZLE ---
+# --- 6. ACTIVITY: TODAY'S PUZZLE ---
 elif st.session_state.mode == "puzzle":
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
@@ -120,7 +118,7 @@ elif st.session_state.mode == "puzzle":
             except Exception:
                 st.warning("💤 The robot is busy right now!")
 
-# --- 8. ACTIVITY: MATH MAGIC ---
+# --- 7. ACTIVITY: MATH MAGIC ---
 elif st.session_state.mode == "math":
     st.write("## ➕ Math Magic!")
     topic = st.radio("Choose a topic:", ["Counting", "Addition", "Subtraction"], horizontal=True)
@@ -142,7 +140,7 @@ elif st.session_state.mode == "math":
             else:
                 st.warning("Try again! You can do it!")
 
-# --- 9. ACTIVITY: FUN FACT ---
+# --- 8. ACTIVITY: FUN FACT ---
 elif st.session_state.mode == "fact":
     st.write("## 💡 Learning Time!")
     if st.button("🌟 GENERATE SURPRISE", use_container_width=True):
@@ -151,9 +149,9 @@ elif st.session_state.mode == "fact":
             response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
             st.success(response.text)
         except Exception:
-            st.warning("💤 Robot is busy!")
+            st.warning("💤 Robot is busy! Try again soon.")
 
-# --- 10. HOME BUTTON ---
+# --- 9. HOME BUTTON ---
 if st.session_state.mode:
     st.write("---")
     if st.button("🏠 START OVER", use_container_width=True, key="main_reset"):
