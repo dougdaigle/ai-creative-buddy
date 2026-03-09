@@ -159,4 +159,29 @@ elif st.session_state.mode == "math":
     if st.session_state.math_problem:
         st.write(f"### {st.session_state.math_problem['q']}")
         user_ans = st.number_input("Answer:", min_value=0, step=1)
-        if st.button("✅ CHECK", use_container_width=True
+        if st.button("✅ CHECK", use_container_width=True):
+            if user_ans == st.session_state.math_problem['a']:
+                st.success("🌟 Amazing!")
+            else:
+                st.warning("Try again!")
+
+# --- 8. ACTIVITY: FUN FACT ---
+elif st.session_state.mode == "fact":
+    st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
+    st.write("## 💡 Learning Time!")
+    if st.button("🌟 SURPRISE ME", use_container_width=True):
+        try:
+            prompt = "One fun fact for kids."
+            response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
+            st.success(response.text)
+        except Exception:
+            st.warning("💤 Robot is busy!")
+
+# --- 9. HOME BUTTON ---
+if st.session_state.mode:
+    st.write("---")
+    if st.button("🏠 START OVER", use_container_width=True):
+        st.session_state.mode = None
+        st.session_state.selected_char = None
+        st.session_state.math_problem = None
+        st.rerun()
