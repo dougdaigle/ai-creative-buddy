@@ -5,19 +5,9 @@ from streamlit_lottie import st_lottie
 import requests
 import datetime
 import random
-import base64
 
-# --- 1. IPAD STYLING & SOUND SETUP ---
+# --- 1. IPAD STYLING & ANIMATION SETUP ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
-
-def play_sound(sound_url):
-    """Helper to play a success sound automatically"""
-    sound_html = f"""
-        <audio autoplay>
-            <source src="{sound_url}" type="audio/mp3">
-        </audio>
-    """
-    st.markdown(sound_html, unsafe_allow_html=True)
 
 def load_lottie(url):
     r = requests.get(url)
@@ -122,7 +112,7 @@ elif st.session_state.mode == "puzzle":
             except Exception:
                 st.warning("💤 The robot is busy right now!")
 
-# --- 7. ACTIVITY: MATH MAGIC (WITH CELEBRATION) ---
+# --- 7. ACTIVITY: MATH MAGIC (CELEBRATION ONLY) ---
 elif st.session_state.mode == "math":
     st.write("## ➕ Math Magic!")
     topic = st.radio("Choose a topic:", ["Counting", "Addition", "Subtraction"], horizontal=True)
@@ -141,8 +131,7 @@ elif st.session_state.mode == "math":
         user_ans = st.number_input("Your Answer:", min_value=0, step=1)
         if st.button("✅ CHECK ANSWER", use_container_width=True):
             if user_ans == st.session_state.math_problem['a']:
-                # PLAY SOUND AND ANIMATION
-                play_sound("https://www.myinstants.com/media/sounds/level-up-video-game-sound-effect-hd.mp3")
+                # SHOW ANIMATION
                 st_lottie(lottie_celebration, height=200, key="success_anim")
                 st.success("🌟 AMAZING! You got it right!")
             else:
