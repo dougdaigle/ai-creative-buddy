@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import os
 
-# --- 1. IPAD STYLING: SKY BLUE & ICON BUTTONS ---
+# --- 1. IPAD STYLING: REFINED HEADER & BUTTON LAYOUT ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
@@ -12,38 +12,40 @@ st.markdown("""
     .kiosk-title {
         color: white;
         text-align: center;
-        font-size: 55px !important;
+        font-size: 50px !important;
         font-weight: 900;
         margin-top: 10px;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
         font-family: 'Arial Black', sans-serif;
         text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
     }
 
-    /* THE ICON BUTTON: Black Text, Giant Emojis, Massive Font */
+    /* THE ICON BUTTON: Optimized for single-line text */
     .kiosk-link {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start; /* Align to the left for better spacing */
         background-color: white !important;
         color: black !important;
         text-decoration: none !important;
-        padding: 20px;
-        font-size: 48px !important; /* Large readable font */
+        padding: 0 40px; /* Side padding only */
+        font-size: 42px !important; /* Slightly smaller to fit single line */
         font-weight: 900 !important;
-        min-height: 160px !important;
+        min-height: 140px !important; /* Slightly shorter to fit more buttons comfortably */
         width: 100% !important;
-        border-radius: 45px;
+        border-radius: 40px;
         border: 8px solid #1a202c;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
         box-shadow: 0px 10px 25px rgba(0,0,0,0.4);
         font-family: 'Arial Black', sans-serif;
+        white-space: nowrap; /* FORCES SINGLE LINE */
+        overflow: hidden;
     }
 
-    /* Styling the Icon specifically to be extra large */
     .btn-icon {
-        font-size: 75px; 
-        margin-right: 25px;
+        font-size: 65px; 
+        margin-right: 30px;
+        flex-shrink: 0;
     }
 
     .kiosk-link:active {
@@ -61,7 +63,7 @@ st.markdown("""
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
-    /* Frame for the coloring sheets */
+    /* Worksheet Frame */
     [data-testid="stImage"] {
         background-color: white;
         padding: 15px;
@@ -73,13 +75,13 @@ st.markdown("""
 
 # --- 2. SESSION STATE ---
 if 'mode' not in st.session_state: st.session_state.mode = None
-if 'selected_char' not in st.session_state: st.session_state.selected_char = None
 
 # --- 3. MAIN MENU (HOME PAGE) ---
 if st.session_state.mode is None:
-    st.markdown('<div class="kiosk-title">Choose an activity:</div>', unsafe_allow_html=True)
+    # Title updated as requested
+    st.markdown('<div class="kiosk-title">Current choice:</div>', unsafe_allow_html=True)
     
-    # HTML Buttons with Giant Icons
+    # HTML Buttons with Giant Icons and single-line enforcement
     st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self"><span class="btn-icon">🎨</span> A. Color Sheet Maker</a>', unsafe_allow_html=True)
     st.markdown('<a href="/?mode=puzzle" class="kiosk-link" target="_self"><span class="btn-icon">🧩</span> B. Today\'s Puzzle</a>', unsafe_allow_html=True)
     st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">💡</span> C. Fun Fact</a>', unsafe_allow_html=True)
@@ -93,27 +95,18 @@ if st.session_state.mode is None:
 # --- 4. ACTIVITY PAGES ---
 else:
     if st.session_state.mode == "coloring":
-        st.markdown('<div class="instruction-text">Pick an animal to color!</div>', unsafe_allow_html=True)
-        # Animal Selection for Demo
+        st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
-            st.image("http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_0", caption="Lion", use_container_width=True)
-            if st.button("Choose Lion", use_container_width=True): st.success("Printing Lion Page..."); st.rerun()
+            st.image("http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_0", use_container_width=True)
+            if st.button("Lion", use_container_width=True): st.success("Printing..."); st.rerun()
         with col2:
-            st.image("http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_2", caption="Elephant", use_container_width=True)
-            if st.button("Choose Elephant", use_container_width=True): st.success("Printing Elephant Page..."); st.rerun()
+            st.image("http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_2", use_container_width=True)
+            if st.button("Elephant", use_container_width=True): st.success("Printing..."); st.rerun()
 
     elif st.session_state.mode == "puzzle":
-        st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
-        st.info("What has hands but cannot clap? \n\n**Answer:** A Clock! ⏰")
-
-    elif st.session_state.mode == "math":
-        st.markdown('<div class="kiosk-title">5 + 5 = ?</div>', unsafe_allow_html=True)
-        if st.button("🌟 SHOW ANSWER", use_container_width=True): st.success("The answer is 10! 🌟")
-
-    elif st.session_state.mode == "fact":
-        st.markdown('<div class="instruction-text">💡 Fun Fact!</div>', unsafe_allow_html=True)
-        st.success("Octopuses have three hearts! 🐙")
+        st.markdown('<div class="instruction-text">Today\'s Riddle</div>', unsafe_allow_html=True)
+        st.info("I have hands but cannot clap. \n\n**Answer:** A Clock! ⏰")
 
     st.write("---")
     if st.button("🏠 BACK TO MENU", use_container_width=True):
