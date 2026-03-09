@@ -1,56 +1,41 @@
 import streamlit as st
-import os
-import random
-import datetime
 from google import genai
 from google.genai import types
+import datetime
+import random
+import os
 
-# --- 1. IPAD STYLING & CARD LAYOUT ---
-st.set_page_config(page_title="My Creative Buddy", layout="centered")
+# --- 1. IPAD STYLING (REVERTED) ---
+st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
     <style>
-    /* Blending the background and removing the top header */
-    .stApp { 
-        background-color: #F8FAFF; 
+    .stApp { background-color: #F8FAFF; }
+    
+    /* Center the logo */
+    .header-container {
+        text-align: center;
+        margin-bottom: 20px;
     }
+
+    h1 { color: #1E3A8A; text-align: center; margin-bottom: 5px; }
+
+    /* iPad Touch Optimization: Solid Borders Reinstated */
+    div.stButton > button {
+        border-radius: 20px;
+        border: 3px solid #1E3A8A;
+        background-color: white;
+        color: #1a202c;
+        font-weight: bold;
+        font-size: 22px !important;
+        height: 90px !important;
+        margin-bottom: 15px;
+        box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+    }
+    
     header {visibility: hidden;}
     footer {visibility: hidden;}
     #MainMenu {visibility: hidden;}
-
-    /* Styling for the Main Menu "Cards" */
-    /* This section removes the 'boxed' look and creates the transparent feel */
-    [data-testid="stVerticalBlock"] > div:has(button) {
-        text-align: center;
-        background-color: white;
-        border-radius: 25px;
-        padding: 20px;
-        # Removed the solid border that was present before
-        # border: 3px solid #1E3A8A; 
-        box-shadow: 0px 4px 15px rgba(0,0,0,0.08); # Softer shadow
-        transition: transform 0.2s; # Fun 'pop' when touched
-    }
-    [data-testid="stVerticalBlock"] > div:has(button):active {
-        transform: scale(0.95); # Touch feedback
-    }
-
-    /* Making the text inside cards dark and readable */
-    h1, h2, h3, p { color: #1E3A8A; text-align: center; }
-
-    /* Centering the images/icons inside the cards */
-    .stImage > img {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 10px;
-    }
-    
-    /* iPad Touch Optimization for inner elements (if any) */
-    .stNumberInput input, .stTextInput input {
-        border-radius: 15px !important;
-        border: 2px solid #1E3A8A !important;
-        text-align: center;
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -69,47 +54,25 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 4. MAIN MENU ---
 if st.session_state.mode is None:
-    # Centering and Displaying Logo
+    # Display Logo
     if os.path.exists("logo.png"):
         _, mid, _ = st.columns([1, 2, 1])
         with mid:
             st.image("logo.png", use_container_width=True)
     else:
-        st.title("🤖 My Creative Buddy")
+        st.markdown("<h1 style='text-align: center;'>🤖 My Creative Buddy</h1>", unsafe_allow_html=True)
     
-    st.write("### Choose your creative adventure!")
-    st.write("Click a card to begin:")
-    
-    # 2x2 Grid using columns for the iPad
+    st.write("### Choose an activity:")
     col1, col2 = st.columns(2)
-    
     with col1:
-        # Card 1: Coloring Page
-        st.image("https://img.icons8.com/color/200/paint-palette.png", width=120)
-        st.markdown("### Coloring Page")
-        # In a real app, this whole container is the touch target.
-        if st.button("Start coloring!", key="start_color", use_container_width=True): 
+        if st.button("🎨 Coloring Page", use_container_width=True): 
             st.session_state.mode = "coloring"; st.rerun()
-
-        # Card 3: Puzzle
-        st.write("---")
-        st.image("https://img.icons8.com/color/200/puzzle.png", width=120)
-        st.markdown("### Today's Puzzle")
-        if st.button("What's the riddle?", key="start_puzzle", use_container_width=True): 
+        if st.button("🧩 Today's Puzzle", use_container_width=True): 
             st.session_state.mode = "puzzle"; st.rerun()
-
     with col2:
-        # Card 2: Fun Fact
-        st.image("https://img.icons8.com/color/200/idea.png", width=120)
-        st.markdown("### Fun Fact")
-        if st.button("Tell me something new!", key="start_fact", use_container_width=True): 
+        if st.button("💡 Fun Fact", use_container_width=True): 
             st.session_state.mode = "fact"; st.rerun()
-
-        # Card 4: Math
-        st.write("---")
-        st.image("https://img.icons8.com/color/200/plus-math.png", width=120)
-        st.markdown("### Math Magic")
-        if st.button("Let's do math!", key="start_math", use_container_width=True): 
+        if st.button("➕ Math Magic", use_container_width=True): 
             st.session_state.mode = "math"; st.rerun()
 
 # --- 5. ACTIVITY: COLORING PAGE ---
@@ -131,9 +94,6 @@ elif st.session_state.mode == "coloring":
                 st.session_state.selected_char = "a magic unicorn"; st.rerun()
     else:
         st.markdown(f"### Ready to draw your **{st.session_state.selected_char.upper()}**?")
-        # Re-using the huge touch-friendly button look for consistency in activities
-        st.markdown("""<style>div.stButton > button { border-radius: 20px; border: 3px solid #1E3A8A; background-color: white; color: #1E3A8A; font-weight: bold; font-size: 20px !important; height: 80px !important; }</style>""", unsafe_allow_html=True)
-        
         if st.button("✨ MAKE MY PAGE ✨", use_container_width=True):
             with st.spinner("Drawing..."):
                 try:
@@ -158,6 +118,7 @@ elif st.session_state.mode == "puzzle":
                 prompt = "Write a very simple riddle for an elementary student. Give the riddle first, then hide the answer far below."
                 response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
                 st.info(response.text)
+                st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
             except Exception:
                 st.warning("💤 The robot is busy right now!")
 
@@ -197,7 +158,6 @@ elif st.session_state.mode == "fact":
 # --- 9. HOME BUTTON ---
 if st.session_state.mode:
     st.write("---")
-    # Using the standard primary button style for the home button
     if st.button("🏠 START OVER", use_container_width=True, key="main_reset"):
         st.session_state.mode = None
         st.session_state.selected_char = None
