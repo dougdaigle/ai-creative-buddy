@@ -48,14 +48,10 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. SESSION STATE (The Memory Bank) ---
+# --- 2. SESSION STATE ---
 if 'mode' not in st.session_state: st.session_state.mode = None
 if 'selected_char' not in st.session_state: st.session_state.selected_char = None
 if 'math_problem' not in st.session_state: st.session_state.math_problem = None
-# New: Keys to hold the specific random choice for the demo
-if 'demo_fact' not in st.session_state: st.session_state.demo_fact = None
-if 'demo_riddle' not in st.session_state: st.session_state.demo_riddle = None
-if 'demo_art' not in st.session_state: st.session_state.demo_art = None
 
 # --- 3. MAIN MENU ---
 if st.session_state.mode is None:
@@ -85,79 +81,77 @@ elif st.session_state.mode == "coloring":
         st.write("## 1. Pick a Friend!")
         c1, c2, c3 = st.columns(3)
         with c1:
-            st.image("https://img.icons8.com/color/200/dinosaur.png")
-            if st.button("Dinosaur"): st.session_state.selected_char = "dinosaur"; st.rerun()
+            st.image("https://img.icons8.com/color/200/dinosaur.png", use_container_width=True)
+            if st.button("Dinosaur", use_container_width=True): 
+                st.session_state.selected_char = "dinosaur"; st.rerun()
         with c2:
-            st.image("https://img.icons8.com/color/200/astronaut-helmet.png")
-            if st.button("Astronaut"): st.session_state.selected_char = "astronaut"; st.rerun()
+            st.image("https://img.icons8.com/color/200/astronaut-helmet.png", use_container_width=True)
+            if st.button("Astronaut", use_container_width=True): 
+                st.session_state.selected_char = "astronaut"; st.rerun()
         with c3:
-            st.image("https://img.icons8.com/color/200/unicorn.png")
-            if st.button("Unicorn"): st.session_state.selected_char = "unicorn"; st.rerun()
+            st.image("https://img.icons8.com/color/200/unicorn.png", use_container_width=True)
+            if st.button("Unicorn", use_container_width=True): 
+                st.session_state.selected_char = "unicorn"; st.rerun()
     else:
+        st.markdown(f"### Ready to see your **{st.session_state.selected_char.upper()}**?")
         if st.button("✨ SHOW MY PAGE ✨", use_container_width=True):
-            arts = {
-                "dinosaur": ["https://img.icons8.com/ios/500/dinosaur.png", "https://img.icons8.com/ios-filled/500/dinosaur.png", "https://img.icons8.com/external-flatart-icons-outline-flatarticons/500/external-dinosaur-dinosaur-flatart-icons-outline-flatarticons.png"],
-                "astronaut": ["https://img.icons8.com/ios/500/astronaut-helmet.png", "https://img.icons8.com/ios-filled/500/astronaut-helmet.png", "https://img.icons8.com/external-outline-juicy-fish/500/external-astronaut-space-exploration-outline-outline-juicy-fish.png"],
-                "unicorn": ["https://img.icons8.com/ios/500/unicorn.png", "https://img.icons8.com/ios-filled/500/unicorn.png", "https://img.icons8.com/external-outline-lafs/500/external-unicorn-fantasy-and-magic-outline-lafs.png"]
-            }
-            st.session_state.demo_art = random.choice(arts[st.session_state.selected_char])
-        
-        if st.session_state.demo_art:
-            st.image(st.session_state.demo_art, use_container_width=True)
-            st.button("🖨️ PRINT NOW", use_container_width=True)
+            with st.spinner("Drawing..."):
+                arts = {
+                    "dinosaur": ["https://img.icons8.com/ios/500/dinosaur.png", "https://img.icons8.com/ios-filled/500/dinosaur.png", "https://img.icons8.com/external-flatart-icons-outline-flatarticons/500/external-dinosaur-dinosaur-flatart-icons-outline-flatarticons.png"],
+                    "astronaut": ["https://img.icons8.com/ios/500/astronaut-helmet.png", "https://img.icons8.com/ios-filled/500/astronaut-helmet.png", "https://img.icons8.com/external-outline-juicy-fish/500/external-astronaut-space-exploration-outline-outline-juicy-fish.png"],
+                    "unicorn": ["https://img.icons8.com/ios/500/unicorn.png", "https://img.icons8.com/ios-filled/500/unicorn.png", "https://img.icons8.com/external-outline-lafs/500/external-unicorn-fantasy-and-magic-outline-lafs.png"]
+                }
+                st.image(random.choice(arts[st.session_state.selected_char]), use_container_width=True)
+                st.button("🖨️ PRINT NOW", use_container_width=True)
 
 # --- 5. PUZZLE ---
 elif st.session_state.mode == "puzzle":
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
+    st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
         riddles = [
-            "I have keys, but no locks. I have a space, but no room. **Answer:** A Keyboard! ⌨️",
-            "What has to be broken before you can use it? **Answer:** An Egg! 🥚",
-            "What has hands but cannot clap? **Answer:** A Clock! ⏰"
+            "I have keys, but no locks. I have a space, but no room. You can enter, but never leave. \n\n**Answer:** A Keyboard! ⌨️",
+            "What has to be broken before you can use it? \n\n**Answer:** An Egg! 🥚",
+            "What has hands but cannot clap? \n\n**Answer:** A Clock! ⏰"
         ]
-        st.session_state.demo_riddle = random.choice(riddles)
-    
-    if st.session_state.demo_riddle:
-        st.info(f"### {st.session_state.demo_riddle}")
-        st.button("🖨️ PRINT RIDDLE", use_container_width=True)
+        st.info(f"### Riddle:\n{random.choice(riddles)}")
+        st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
 
-# --- 6. MATH ---
+# --- 6. MATH MAGIC (LIVE) ---
 elif st.session_state.mode == "math":
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## ➕ Math Magic!")
     topic = st.radio("Topic:", ["Counting", "Addition", "Subtraction"], horizontal=True)
-    if st.button("📝 GENERATE", use_container_width=True):
+    if st.button("📝 GENERATE PROBLEM", use_container_width=True):
         n1, n2 = random.randint(1, 10), random.randint(1, 10)
-        if topic == "Counting": st.session_state.math_problem = {"q": f"Count: {'⭐' * n1}", "a": n1}
+        if topic == "Counting": st.session_state.math_problem = {"q": f"Count the stars: {'⭐' * n1}", "a": n1}
         elif topic == "Addition": st.session_state.math_problem = {"q": f"{n1} + {n2} =", "a": n1 + n2}
         else: st.session_state.math_problem = {"q": f"{max(n1,n2)} - {min(n1,n2)} =", "a": abs(n1-n2)}
     if st.session_state.math_problem:
         st.write(f"### {st.session_state.math_problem['q']}")
-        ans = st.number_input("Answer:", min_value=0, step=1)
+        ans = st.number_input("Your Answer:", min_value=0, step=1)
         if st.button("✅ CHECK", use_container_width=True):
-            if ans == st.session_state.math_problem['a']: st.success("🌟 Correct!")
+            if ans == st.session_state.math_problem['a']: st.success("🌟 Amazing!")
             else: st.warning("Try again!")
 
-# --- 7. FACT ---
+# --- 7. FUN FACT ---
 elif st.session_state.mode == "fact":
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
+    st.write("## 💡 Learning Time!")
     if st.button("🌟 SURPRISE ME", use_container_width=True):
         facts = [
             "A group of flamingos is called a **flamboyance**! 🦩",
             "Honey never spoils. Archaeologists found some 3,000 years old! 🍯",
             "Octopuses have **three hearts** and blue blood! 🐙"
         ]
-        st.session_state.demo_fact = random.choice(facts)
-    
-    if st.session_state.demo_fact:
-        st.success(f"### {st.session_state.demo_fact}")
-        st.button("🖨️ PRINT FACT", use_container_width=True)
+        st.success(f"### Did you know?\n\n{random.choice(facts)}")
+        st.button("🖨️ PRINT FACT STRIP", use_container_width=True)
 
-# --- 8. HOME ---
+# --- 8. HOME BUTTON ---
 if st.session_state.mode:
     st.write("---")
     if st.button("🏠 START OVER", use_container_width=True):
-        # Clear everything for a fresh start
-        for key in ['mode', 'selected_char', 'math_problem', 'demo_fact', 'demo_riddle', 'demo_art']:
-            st.session_state[key] = None
+        st.session_state.mode = None
+        st.session_state.selected_char = None
+        st.session_state.math_problem = None
         st.rerun()
