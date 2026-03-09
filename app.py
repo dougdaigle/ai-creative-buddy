@@ -5,19 +5,27 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING (CLEAN & TRANSPARENT) ---
+# --- 1. IPAD STYLING (BIGGER LOGO & TOUCH OPTIMIZED) ---
 st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
     <style>
-    /* Soft background to blend with transparent logo */
+    /* Soft background for blending */
     .stApp { background-color: #F8FAFF; }
     
-    /* Ensure the logo container has no background or border */
+    /* REMOVE THE WHITE BOX: Targeting the image container specifically */
     [data-testid="stImage"] {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Force the image to be larger than standard Streamlit limits */
+    [data-testid="stImage"] img {
+        max-width: 100% !important;
+        height: auto !important;
     }
 
     h1, h3 { color: #1E3A8A; text-align: center; }
@@ -55,9 +63,9 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 4. MAIN MENU ---
 if st.session_state.mode is None:
-    # Display Logo with no background box
+    # Display Logo significantly larger using a 5:1 ratio for the center
     if os.path.exists("logo.png"):
-        _, mid, _ = st.columns([1, 3, 1])
+        _, mid, _ = st.columns([0.5, 5, 0.5])
         with mid:
             st.image("logo.png", use_container_width=True)
     else:
