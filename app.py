@@ -1,6 +1,7 @@
 import streamlit as st
 from google import genai
 from google.genai import types
+import datetime
 
 # --- 1. KIOSK STYLING ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
@@ -8,23 +9,17 @@ st.set_page_config(page_title="My Creative Buddy", layout="centered")
 st.markdown("""
     <style>
     .stApp { background-color: #F0F5FF; }
-    /* Style for the Picture Cards */
-    [data-testid="stVerticalBlock"] > div:has(button) {
-        text-align: center;
-    }
-    /* Make selection buttons look like "Cards" */
+    h1, h2, h3 { color: #1E3A8A; text-align: center; }
+    label { color: #1E3A8A !important; font-weight: bold; }
+    
+    /* Button Styling */
     div.stButton > button {
         border-radius: 20px;
         border: 3px solid #1E3A8A;
         background-color: white;
         color: #1a202c;
-        transition: 0.3s;
+        font-weight: bold;
     }
-    div.stButton > button:active {
-        background-color: #FFD700;
-        transform: scale(0.95);
-    }
-    h1, h2, h3 { color: #1E3A8A; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -54,30 +49,23 @@ if st.session_state.mode is None:
     with col3:
         if st.button("💡\nFun\nFact"): st.session_state.mode = "fact"
 
-# --- 5. ACTIVITY: PICTURE SELECTION ---
+# --- 5. ACTIVITY: COLORING PAGE (STAYS THE SAME) ---
 if st.session_state.mode == "coloring":
     st.write("## 1. Pick a Friend!")
-    
-    # Create a grid of 3 pictures
     char_col1, char_col2, char_col3 = st.columns(3)
     
     with char_col1:
         st.image("https://img.icons8.com/color/200/dinosaur.png", width=150)
         if st.button("Dinosaur"): st.session_state.selected_char = "a friendly dinosaur"
-        
     with char_col2:
         st.image("https://img.icons8.com/color/200/astronaut-helmet.png", width=150)
         if st.button("Astronaut"): st.session_state.selected_char = "a brave astronaut"
-        
     with char_col3:
         st.image("https://img.icons8.com/color/200/unicorn.png", width=150)
         if st.button("Unicorn"): st.session_state.selected_char = "a magic unicorn"
 
-    # Show what is selected
     if st.session_state.selected_char:
-        st.success(f"You picked: **{st.session_state.selected_char.upper()}**")
-        
-        st.write("## 2. Ready to Draw?")
+        st.success(f"Selected: {st.session_state.selected_char.upper()}")
         if st.button("✨ MAKE MY COLORING PAGE ✨"):
             with st.spinner("Drawing..."):
                 try:
@@ -91,9 +79,30 @@ if st.session_state.mode == "coloring":
                             st.image(part.as_image(), use_container_width=True)
                             st.button("🖨️ PRINT NOW")
                 except Exception as e:
-                    st.error("The robot is busy! Try again in a minute.")
+                    st.error("Robot is busy! Try again soon.")
 
-# --- 6. HOME BUTTON ---
+# --- 6. ACTIVITY: LIVE FUN FACT (NOW WORKING!) ---
+elif st.session_state.mode == "fact":
+    st.write("## 💡 Learning Time!")
+    
+    today = datetime.date.today().strftime("%B %d")
+    
+    if st.button("🌟 GENERATE TODAY'S SURPRISE 🌟"):
+        with st.spinner("Searching the robot brain..."):
+            try:
+                # Ask Gemini for a cool kid-friendly fact for today
+                prompt = f"Give me one fun 'On This Day' fact for {today} and one weird animal fact. Keep it simple for an elementary student. Use emojis!"
+                response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
+                
+                st.markdown(f"### {today} is a special day!")
+                st.success(response.text)
+                
+                st.write("---")
+                st.button("🖨️ PRINT FACT STRIP")
+            except Exception as e:
+                st.error("The robot forgot its history book! Try again in a second.")
+
+# --- 7. HOME BUTTON ---
 if st.session_state.mode is not None:
     st.write("---")
     if st.button("🏠 START OVER"):
