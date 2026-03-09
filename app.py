@@ -3,7 +3,7 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING: Sky Blue Background & Massive Black Text ---
+# --- 1. IPAD STYLING: Sky Blue Background & Forced Visible Text ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
@@ -16,40 +16,50 @@ st.markdown("""
     .menu-title {
         color: white;
         text-align: center;
-        font-size: 50px; /* Larger title */
+        font-size: 60px !important; /* Massive Title */
         font-weight: 900;
         margin-top: 20px;
         margin-bottom: 40px;
-        text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+        text-shadow: 4px 4px 8px rgba(0,0,0,0.4);
+        font-family: 'Arial Black', sans-serif;
     }
 
-    /* MASSIVE WHITE BUTTONS: Bold Black text */
+    /* WHITE BUTTONS WITH FORCED BLACK TEXT */
     div.stButton > button {
         background-color: white !important;
-        color: black !important; /* Text is now Black */
+        color: #000000 !important; /* FORCED SOLID BLACK */
         border-radius: 40px !important;
-        border: 6px solid #1a202c !important; /* Thick dark border for contrast */
-        font-size: 60px !important; /* MAXIMUM FONT SIZE */
+        border: 8px solid #1a202c !important; /* Extra thick border for visibility */
+        font-size: 70px !important; /* GIANT FONT */
         font-weight: 900 !important;
-        height: 180px !important; /* Even taller for giant text */
+        height: 200px !important; /* Taller boxes */
         width: 100% !important;
-        box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
-        margin-bottom: 40px;
-        transition: all 0.1s ease;
+        box-shadow: 0px 12px 24px rgba(0,0,0,0.5);
+        margin-bottom: 45px;
+        font-family: 'Arial Black', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    div.stButton > button:active {
-        transform: scale(0.97);
-        background-color: #E0E0E0 !important;
+    /* Ensure text stays black even when hovering or clicking on iPad */
+    div.stButton > button:hover, div.stButton > button:active, div.stButton > button:focus {
+        color: #000000 !important;
+        background-color: #f0f0f0 !important;
     }
     
-    /* Clean Kiosk UI */
+    /* Clean Kiosk UI: Hide standard Streamlit elements */
     header {visibility: hidden;}
     footer {visibility: hidden;}
     #MainMenu {visibility: hidden;}
     
-    /* Ensuring all sub-labels match the high-contrast theme */
-    h2, h3, p, label { color: white !important; text-align: center; font-weight: 900; font-size: 30px !important; }
+    /* Global label styling */
+    h2, h3, p, label { 
+        color: white !important; 
+        text-align: center; 
+        font-weight: 900; 
+        font-size: 40px !important; 
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -62,8 +72,8 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 if st.session_state.mode is None:
     st.markdown('<div class="menu-title">Choose an activity:</div>', unsafe_allow_html=True)
     
-    # Matching the exact lettered style from the kiosk photo
-    if st.button("A. Color Sheet Maker", use_container_width=True): 
+    # Matching the exact lettered style with GIANT visible text
+    if st.button("A. Coloring Sheet", use_container_width=True): 
         st.session_state.mode = "coloring"; st.rerun()
         
     if st.button("B. Today's Puzzle", use_container_width=True): 
@@ -75,71 +85,35 @@ if st.session_state.mode is None:
     if st.button("D. Math Magic", use_container_width=True): 
         st.session_state.mode = "math"; st.rerun()
 
-# --- 4. COLORING PAGE ---
+# --- 4. ACTIVITY: COLORING PAGE ---
 elif st.session_state.mode == "coloring":
-    if st.session_state.selected_char is None:
-        st.write("## Pick a Friend!")
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            st.image("https://img.icons8.com/color/200/dinosaur.png", use_container_width=True)
-            if st.button("Dino", use_container_width=True): 
-                st.session_state.selected_char = "dinosaur"; st.rerun()
-        with c2:
-            st.image("https://img.icons8.com/color/200/astronaut-helmet.png", use_container_width=True)
-            if st.button("Astro", use_container_width=True): 
-                st.session_state.selected_char = "astronaut"; st.rerun()
-        with c3:
-            st.image("https://img.icons8.com/color/200/unicorn.png", use_container_width=True)
-            if st.button("Magic", use_container_width=True): 
-                st.session_state.selected_char = "unicorn"; st.rerun()
-    else:
-        st.write(f"## Showing your {st.session_state.selected_char}!")
-        if st.button("✨ SHOW DRAWING", use_container_width=True):
-            arts = {
-                "dinosaur": ["https://img.icons8.com/ios/500/dinosaur.png", "https://img.icons8.com/ios-filled/500/dinosaur.png", "https://img.icons8.com/external-flatart-icons-outline-flatarticons/500/external-dinosaur-dinosaur-flatart-icons-outline-flatarticons.png"],
-                "astronaut": ["https://img.icons8.com/ios/500/astronaut-helmet.png", "https://img.icons8.com/ios-filled/500/astronaut-helmet.png", "https://img.icons8.com/external-outline-juicy-fish/500/external-astronaut-space-exploration-outline-outline-juicy-fish.png"],
-                "unicorn": ["https://img.icons8.com/ios/500/unicorn.png", "https://img.icons8.com/ios-filled/500/unicorn.png", "https://img.icons8.com/external-outline-lafs/500/external-unicorn-fantasy-and-magic-outline-lafs.png"]
-            }
-            st.image(random.choice(arts[st.session_state.selected_char]), use_container_width=True)
-            st.button("🖨️ PRINT NOW", use_container_width=True)
+    st.write("## Pick a Friend!")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        if st.button("Dino", use_container_width=True): 
+            st.session_state.selected_char = "dinosaur"; st.rerun()
+    with c2:
+        if st.button("Astro", use_container_width=True): 
+            st.session_state.selected_char = "astronaut"; st.rerun()
+    with c3:
+        if st.button("Magic", use_container_width=True): 
+            st.session_state.selected_char = "unicorn"; st.rerun()
 
-# --- 5. PUZZLE ---
+# --- 5. PUZZLE / MATH / FACT (STATIC FOR DEMO) ---
 elif st.session_state.mode == "puzzle":
-    st.write("## Today's Riddle")
-    if st.button("🎲 GET RIDDLE", use_container_width=True):
-        riddles = [
-            "I have keys, but no locks. I have a space, but no room. \n\n**Answer:** A Keyboard! ⌨️",
-            "What has hands but cannot clap? \n\n**Answer:** A Clock! ⏰"
-        ]
-        st.info(f"### {random.choice(riddles)}")
+    st.info("### What has hands but cannot clap? \n\n**Answer:** A Clock! ⏰")
 
-# --- 6. MATH ---
 elif st.session_state.mode == "math":
-    st.write("## Math Magic!")
-    if st.button("📝 NEW PROBLEM", use_container_width=True):
-        n1, n2 = random.randint(1, 10), random.randint(1, 10)
-        st.session_state.math_problem = {"q": f"{n1} + {n2} =", "a": n1 + n2}
-    if st.session_state.math_problem:
-        st.write(f"### {st.session_state.math_problem['q']}")
-        ans = st.number_input("Answer:", min_value=0, step=1)
-        if st.button("✅ CHECK", use_container_width=True):
-            if ans == st.session_state.math_problem['a']: st.success("🌟 Correct!")
-            else: st.warning("Try again!")
+    st.write("## 5 + 3 = ?")
+    st.success("### Answer: 8! 🌟")
 
-# --- 7. FACT ---
 elif st.session_state.mode == "fact":
-    st.write("## Fun Fact!")
-    if st.button("🌟 SURPRISE ME", use_container_width=True):
-        facts = ["Octopuses have three hearts! 🐙", "Honey never spoils! 🍯"]
-        st.success(f"### {random.choice(facts)}")
+    st.success("### Did you know? Octopuses have three hearts! 🐙")
 
-# --- 8. HOME ---
+# --- 6. HOME BUTTON ---
 if st.session_state.mode:
-    # Stylizing the Back button to be a bit smaller but still black text
-    st.markdown("<style>#back_btn button { height: 100px !important; font-size: 40px !important; }</style>", unsafe_allow_html=True)
     st.write("---")
-    if st.button("🏠 BACK TO MENU", use_container_width=True, key="back_btn"):
+    if st.button("🏠 BACK", use_container_width=True):
         st.session_state.mode = None
         st.session_state.selected_char = None
-        st.session_state.math_problem = None
         st.rerun()
