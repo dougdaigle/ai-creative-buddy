@@ -3,7 +3,7 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING: Sky Blue Background & Large White Buttons ---
+# --- 1. IPAD STYLING: Sky Blue Background & Massive Black Text ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
@@ -16,31 +16,31 @@ st.markdown("""
     .menu-title {
         color: white;
         text-align: center;
-        font-size: 40px;
-        font-weight: bold;
-        margin-top: 30px;
-        margin-bottom: 30px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        font-size: 50px; /* Larger title */
+        font-weight: 900;
+        margin-top: 20px;
+        margin-bottom: 40px;
+        text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
     }
 
-    /* LARGE WHITE BUTTONS: Dark Blue text, thick border, massive font */
+    /* MASSIVE WHITE BUTTONS: Bold Black text */
     div.stButton > button {
         background-color: white !important;
-        color: #1E3A8A !important; /* Dark Blue text */
-        border-radius: 30px !important;
-        border: 5px solid #1E3A8A !important; 
-        font-size: 45px !important; /* MUCH LARGER FONT */
+        color: black !important; /* Text is now Black */
+        border-radius: 40px !important;
+        border: 6px solid #1a202c !important; /* Thick dark border for contrast */
+        font-size: 60px !important; /* MAXIMUM FONT SIZE */
         font-weight: 900 !important;
-        height: 150px !important; /* TALLER BUTTONS */
+        height: 180px !important; /* Even taller for giant text */
         width: 100% !important;
-        box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
-        margin-bottom: 35px;
-        transition: transform 0.1s;
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+        margin-bottom: 40px;
+        transition: all 0.1s ease;
     }
 
     div.stButton > button:active {
-        transform: scale(0.98);
-        background-color: #F0F0F0 !important;
+        transform: scale(0.97);
+        background-color: #E0E0E0 !important;
     }
     
     /* Clean Kiosk UI */
@@ -48,8 +48,8 @@ st.markdown("""
     footer {visibility: hidden;}
     #MainMenu {visibility: hidden;}
     
-    /* White text for general labels */
-    h2, h3, p, label { color: white !important; text-align: center; font-weight: bold; }
+    /* Ensuring all sub-labels match the high-contrast theme */
+    h2, h3, p, label { color: white !important; text-align: center; font-weight: 900; font-size: 30px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -60,19 +60,19 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 3. MAIN MENU ---
 if st.session_state.mode is None:
-    st.markdown('<div class="menu-title">Current choice:</div>', unsafe_allow_html=True)
+    st.markdown('<div class="menu-title">Choose an activity:</div>', unsafe_allow_html=True)
     
-    # Matching the A-C lettered style from the kiosk photo
-    if st.button("🎨 A. Color Sheet Maker", use_container_width=True): 
+    # Matching the exact lettered style from the kiosk photo
+    if st.button("A. Color Sheet Maker", use_container_width=True): 
         st.session_state.mode = "coloring"; st.rerun()
         
-    if st.button("🧩 B. Today's Puzzle", use_container_width=True): 
+    if st.button("B. Today's Puzzle", use_container_width=True): 
         st.session_state.mode = "puzzle"; st.rerun()
         
-    if st.button("💡 C. Fun Fact", use_container_width=True): 
+    if st.button("C. Fun Fact", use_container_width=True): 
         st.session_state.mode = "fact"; st.rerun()
         
-    if st.button("➕ D. Math Magic", use_container_width=True): 
+    if st.button("D. Math Magic", use_container_width=True): 
         st.session_state.mode = "math"; st.rerun()
 
 # --- 4. COLORING PAGE ---
@@ -135,8 +135,10 @@ elif st.session_state.mode == "fact":
 
 # --- 8. HOME ---
 if st.session_state.mode:
+    # Stylizing the Back button to be a bit smaller but still black text
+    st.markdown("<style>#back_btn button { height: 100px !important; font-size: 40px !important; }</style>", unsafe_allow_html=True)
     st.write("---")
-    if st.button("🏠 BACK TO MENU", use_container_width=True):
+    if st.button("🏠 BACK TO MENU", use_container_width=True, key="back_btn"):
         st.session_state.mode = None
         st.session_state.selected_char = None
         st.session_state.math_problem = None
