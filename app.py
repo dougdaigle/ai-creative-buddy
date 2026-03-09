@@ -5,42 +5,39 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING ---
-st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
+# --- 1. IPAD STYLING & LOGO BLENDING ---
+st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
-# Every line between the triple quotes below is CSS. 
-# The error happened because one of these quotes was likely missing.
 st.markdown("""
     <style>
-    .stApp { background-color: #F0F5FF; }
+    /* Blending the background with the logo's soft tones */
+    .stApp { 
+        background-color: #F8FAFF; 
+    }
     
-    .header-container {
-        text-align: center;
+    /* Centering the Logo */
+    .logo-container {
+        display: flex;
+        justify-content: center;
         margin-bottom: 20px;
     }
 
-    h1 { color: #1E3A8A; text-align: center; margin-bottom: 5px; }
-    
-    .slogan {
-        text-align: center;
-        color: #4A90E2;
-        font-size: 22px;
-        font-weight: bold;
-        margin-top: -5px;
-        margin-bottom: 30px;
-    }
+    h1, h2, h3 { color: #1E3A8A; text-align: center; }
 
+    /* iPad Touch Optimization for Buttons */
     div.stButton > button {
-        border-radius: 20px;
+        border-radius: 25px;
         border: 3px solid #1E3A8A;
         background-color: white;
-        color: #1a202c;
+        color: #1E3A8A;
         font-weight: bold;
-        font-size: 20px !important;
-        height: 80px !important;
-        margin-bottom: 20px;
+        font-size: 22px !important;
+        height: 90px !important;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+        margin-bottom: 15px;
     }
     
+    /* Clean Kiosk look: Hide menus */
     header {visibility: hidden;}
     footer {visibility: hidden;}
     #MainMenu {visibility: hidden;}
@@ -62,13 +59,13 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 4. MAIN MENU ---
 if st.session_state.mode is None:
-    # Display Logo if it exists in your GitHub folder
+    # Display Logo centered at the top
     if os.path.exists("logo.png"):
-        st.image("logo.png", use_container_width=True)
+        _, mid, _ = st.columns([1, 2, 1])
+        with mid:
+            st.image("logo.png", use_container_width=True)
     else:
-        st.markdown("<h1 style='text-align: center;'>🤖 My Creative Buddy</h1>", unsafe_allow_html=True)
-    
-    st.markdown('<p class="slogan">AI Exploration for Kids</p>', unsafe_allow_html=True)
+        st.title("🤖 My Creative Buddy")
     
     st.write("### Choose an activity:")
     col1, col2 = st.columns(2)
