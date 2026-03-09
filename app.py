@@ -34,24 +34,25 @@ st.markdown("""
         color: black !important;
         border-radius: 40px !important;
         border: 8px solid #1a202c !important;
-        font-size: 50px !important;
+        font-size: 45px !important;
         font-weight: 900 !important;
-        min-height: 160px !important;
+        min-height: 140px !important;
         width: 100% !important;
         box-shadow: 0px 10px 25px rgba(0,0,0,0.4) !important;
         font-family: 'Arial Black', sans-serif !important;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: 30px !important;
+        margin-bottom: 20px !important;
     }
 
-    /* Smaller styling for the floating back button specifically */
+    /* Floating Back Button Specific Style */
     .floating-back-btn div.stButton > button {
         min-height: 80px !important;
         font-size: 30px !important;
         padding: 0 30px !important;
         border: 5px solid #1a202c !important;
+        width: auto !important;
     }
 
     /* UI Cleanup */
@@ -123,31 +124,36 @@ if st.session_state.page == "home":
 elif st.session_state.page == "coloring":
     if st.session_state.animal is None:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
-        animals = ["🦁 LION", "🐘 ELEPHANT", "🦒 GIRAFFE", "🦓 ZEBRA", "🐒 MONKEY", "🐯 TIGER"]
-        for a in animals:
-            if st.button(a):
-                st.session_state.animal = a.split()[-1] # Grabs just the name
+        
+        # Expanded Animal List in Two Columns
+        animals = [
+            ("🦁 LION", "LION"), ("🐘 ELEPHANT", "ELEPHANT"), 
+            ("🦒 GIRAFFE", "GIRAFFE"), ("🦓 ZEBRA", "ZEBRA"), 
+            ("🐒 MONKEY", "MONKEY"), ("🐯 TIGER", "TIGER"),
+            ("🐻 BEAR", "BEAR"), ("🦛 HIPPO", "HIPPO"),
+            ("🐊 CROC", "CROC"), ("🦘 KANGO", "KANGO")
+        ]
+        
+        col1, col2 = st.columns(2)
+        for i, (label, name) in enumerate(animals):
+            target_col = col1 if i % 2 == 0 else col2
+            if target_col.button(label, key=f"btn_{name}"):
+                st.session_state.animal = name
                 st.rerun()
     else:
+        # Title: [Animal Name] Color Sheet
         st.markdown(f'<div class="instruction-text">{st.session_state.animal} Color Sheet</div>', unsafe_allow_html=True)
         
-        animal_imgs = {
-            "LION": "https://img.icons8.com/ios/500/lion.png",
-            "ELEPHANT": "https://img.icons8.com/ios/500/elephant.png",
-            "GIRAFFE": "https://img.icons8.com/ios/500/giraffe.png",
-            "ZEBRA": "https://img.icons8.com/ios/500/zebra.png",
-            "MONKEY": "https://img.icons8.com/ios/500/monkey.png",
-            "TIGER": "https://img.icons8.com/ios/500/tiger-side-view.png"
-        }
-        
+        # Reliable images for preview
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        st.image(animal_imgs.get(st.session_state.animal, ""), use_container_width=True)
+        # Using a reliable placeholder for all animals in the demo
+        st.image(f"https://img.icons8.com/ios/500/{st.session_state.animal.lower()}.png", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
         if st.button("🖨️ PRINT NOW"):
             st.success("Success! Pick up your page at the desk.")
 
-# OTHER PAGES (PUZZLE, MATH, FACT)
+# PUZZLE PAGE
 elif st.session_state.page == "puzzle":
     st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
     st.markdown('<div class="answer-box">What has hands but cannot clap?</div>', unsafe_allow_html=True)
@@ -157,6 +163,7 @@ elif st.session_state.page == "puzzle":
         if st.button("🔍 SHOW ANSWER"):
             st.session_state.reveal = True; st.rerun()
 
+# MATH MAGIC
 elif st.session_state.page == "math":
     st.markdown('<div class="instruction-text">➕ Math Magic!</div>', unsafe_allow_html=True)
     st.markdown('<div class="answer-box" style="font-size:80px !important;">5 + 5 = ?</div>', unsafe_allow_html=True)
@@ -166,6 +173,7 @@ elif st.session_state.page == "math":
         if st.button("🤔 CHECK"):
             st.session_state.reveal = True; st.rerun()
 
+# FUN FACT
 elif st.session_state.page == "fact":
     st.markdown('<div class="instruction-text">💡 Fun Fact!</div>', unsafe_allow_html=True)
     st.markdown('<div class="answer-box">Octopuses have three hearts! 🐙</div>', unsafe_allow_html=True)
