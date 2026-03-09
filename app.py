@@ -5,25 +5,28 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING: LOGO SPIN & GOLD PULSE ---
+# --- 1. IPAD STYLING: SELECTIVE SPIN & GOLD PULSE ---
 st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
     <style>
     .stApp { background-color: #F8FAFF; }
     
+    /* 1. LOGO SPIN ANIMATION (Targeted to the header area only) */
     @keyframes logo-spin {
         0% { transform: rotate(0deg); }
         10% { transform: rotate(360deg); } 
         100% { transform: rotate(360deg); } 
     }
 
-    [data-testid="stImage"] img {
+    /* This selector only targets the logo on the Home Page */
+    .home-logo img {
         animation: logo-spin 10s infinite ease-in-out !important;
         max-width: 100% !important;
         height: auto !important;
     }
 
+    /* 2. GOLD BUTTON PULSE ANIMATION */
     @keyframes gold-glow {
         0% { border-color: #1E3A8A; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); }
         50% { border-color: #FFD700; box-shadow: 0px 0px 20px #FFD700; transform: scale(1.02); }
@@ -43,12 +46,11 @@ st.markdown("""
         animation: gold-glow 5s infinite ease-in-out;
     }
 
+    /* Ensure all image containers remain transparent */
     [data-testid="stImage"] {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
-        display: flex;
-        justify-content: center;
     }
 
     h1, h3 { color: #1E3A8A; text-align: center; }
@@ -76,7 +78,10 @@ if st.session_state.mode is None:
     if os.path.exists("logo.png"):
         _, mid, _ = st.columns([0.5, 5, 0.5])
         with mid:
+            # Wrapped in a div class 'home-logo' so ONLY this image spins
+            st.markdown('<div class="home-logo">', unsafe_allow_html=True)
             st.image("logo.png", use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.markdown("<h1>🤖 My Creative Buddy</h1>", unsafe_allow_html=True)
     
@@ -115,19 +120,18 @@ elif st.session_state.mode == "coloring":
     else:
         st.markdown(f"### Ready to see your **{st.session_state.selected_char.upper()}**?")
         
-        # DEMO GENERATE BUTTON
         if st.button("✨ SHOW MY PAGE ✨", use_container_width=True):
             with st.spinner("Drawing..."):
-                # Static Images for Demo - No API Charges!
                 demo_images = {
                     "dinosaur": "https://img.icons8.com/ios/500/dinosaur.png",
                     "astronaut": "https://img.icons8.com/ios/500/astronaut-helmet.png",
                     "unicorn": "https://img.icons8.com/ios/500/unicorn.png"
                 }
-                st.image(demo_images[st.session_state.selected_char], caption="Demo Mode: Black & White Line Art", use_container_width=True)
+                # No 'home-logo' class here, so these stay static
+                st.image(demo_images[st.session_state.selected_char], use_container_width=True)
                 st.button("🖨️ PRINT NOW", use_container_width=True)
 
-# --- 6. ACTIVITY: TODAY'S PUZZLE (STILL AI) ---
+# --- 6. ACTIVITY: TODAY'S PUZZLE ---
 elif st.session_state.mode == "puzzle":
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## 🧩 The Robot's Riddle")
