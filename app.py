@@ -89,10 +89,8 @@ elif st.session_state.mode == "coloring":
                             st.button("🖨️ PRINT NOW", use_container_width=True)
                 except Exception:
                     st.warning("💤 The robot is taking a nap. Try again in 1 minute!")
-                    if st.button("🏠 Start Over"):
-                        st.session_state.mode = None; st.rerun()
 
-# --- 6. ACTIVITY: TODAY'S PUZZLE (FIXED ERROR HANDLING) ---
+# --- 6. ACTIVITY: TODAY'S PUZZLE (CLEAN ERROR HANDLING) ---
 elif st.session_state.mode == "puzzle":
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
@@ -103,10 +101,8 @@ elif st.session_state.mode == "puzzle":
                 st.info(response.text)
                 st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
             except Exception:
-                # Standard Busy Error Message instead of Traceback
+                # Friendly error message only
                 st.warning("💤 The robot is busy right now! Please wait a moment.")
-                if st.button("🏠 Start Over"):
-                    st.session_state.mode = None; st.rerun()
 
 # --- 7. ACTIVITY: MATH MAGIC ---
 elif st.session_state.mode == "math":
@@ -141,7 +137,7 @@ elif st.session_state.mode == "fact":
         except Exception:
             st.warning("💤 Robot is busy! Try again soon.")
 
-# --- 9. HOME BUTTON ---
+# --- 9. LARGE HOME BUTTON ---
 if st.session_state.mode:
     st.write("---")
     if st.button("🏠 START OVER", use_container_width=True, key="main_reset"):
