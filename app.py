@@ -12,7 +12,6 @@ st.markdown("""
     <style>
     .stApp { background-color: #F8FAFF; }
     
-    /* 1. LOGO SPIN ANIMATION */
     @keyframes logo-spin {
         0% { transform: rotate(0deg); }
         10% { transform: rotate(360deg); } 
@@ -25,14 +24,12 @@ st.markdown("""
         height: auto !important;
     }
 
-    /* 2. GOLD BUTTON PULSE ANIMATION */
     @keyframes gold-glow {
         0% { border-color: #1E3A8A; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); }
         50% { border-color: #FFD700; box-shadow: 0px 0px 20px #FFD700; transform: scale(1.02); }
         100% { border-color: #1E3A8A; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); }
     }
 
-    /* Applying the pulse to all main menu buttons */
     div.stButton > button {
         border-radius: 20px;
         border: 3px solid #1E3A8A;
@@ -43,7 +40,6 @@ st.markdown("""
         height: 90px !important;
         margin-bottom: 15px;
         transition: all 0.3s ease;
-        /* Pulsing every 5 seconds to stay dynamic */
         animation: gold-glow 5s infinite ease-in-out;
     }
 
@@ -56,7 +52,6 @@ st.markdown("""
     }
 
     h1, h3 { color: #1E3A8A; text-align: center; }
-    
     header {visibility: hidden;}
     footer {visibility: hidden;}
     #MainMenu {visibility: hidden;}
@@ -98,9 +93,8 @@ if st.session_state.mode is None:
         if st.button("➕ Math Magic", use_container_width=True): 
             st.session_state.mode = "math"; st.rerun()
 
-# --- 5. ACTIVITY: COLORING PAGE ---
+# --- 5. ACTIVITY: COLORING PAGE (DEMO MODE) ---
 elif st.session_state.mode == "coloring":
-    # Disable pulsing for child-selection buttons so they can focus
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     
     if st.session_state.selected_char is None:
@@ -109,44 +103,42 @@ elif st.session_state.mode == "coloring":
         with c1:
             st.image("https://img.icons8.com/color/200/dinosaur.png", use_container_width=True)
             if st.button("Dinosaur", use_container_width=True): 
-                st.session_state.selected_char = "a friendly dinosaur"; st.rerun()
+                st.session_state.selected_char = "dinosaur"; st.rerun()
         with c2:
             st.image("https://img.icons8.com/color/200/astronaut-helmet.png", use_container_width=True)
             if st.button("Astronaut", use_container_width=True): 
-                st.session_state.selected_char = "a brave astronaut"; st.rerun()
+                st.session_state.selected_char = "astronaut"; st.rerun()
         with c3:
             st.image("https://img.icons8.com/color/200/unicorn.png", use_container_width=True)
             if st.button("Unicorn", use_container_width=True): 
-                st.session_state.selected_char = "a magic unicorn"; st.rerun()
+                st.session_state.selected_char = "unicorn"; st.rerun()
     else:
-        st.markdown(f"### Ready to draw your **{st.session_state.selected_char.upper()}**?")
-        if st.button("✨ MAKE MY PAGE ✨", use_container_width=True):
+        st.markdown(f"### Ready to see your **{st.session_state.selected_char.upper()}**?")
+        
+        # DEMO GENERATE BUTTON
+        if st.button("✨ SHOW MY PAGE ✨", use_container_width=True):
             with st.spinner("Drawing..."):
-                try:
-                    response = client.models.generate_content(
-                        model='gemini-3.1-flash-image-preview',
-                        contents=f"Kids coloring book page, black and white line art of {st.session_state.selected_char}. Thick outlines, no shading.",
-                        config=types.GenerateContentConfig(response_modalities=["IMAGE"])
-                    )
-                    for part in response.parts:
-                        if part.inline_data:
-                            st.image(part.as_image(), use_container_width=True)
-                            st.button("🖨️ PRINT NOW", use_container_width=True)
-                except Exception:
-                    st.warning("💤 The robot is taking a nap!")
+                # Static Images for Demo - No API Charges!
+                demo_images = {
+                    "dinosaur": "https://img.icons8.com/ios/500/dinosaur.png",
+                    "astronaut": "https://img.icons8.com/ios/500/astronaut-helmet.png",
+                    "unicorn": "https://img.icons8.com/ios/500/unicorn.png"
+                }
+                st.image(demo_images[st.session_state.selected_char], caption="Demo Mode: Black & White Line Art", use_container_width=True)
+                st.button("🖨️ PRINT NOW", use_container_width=True)
 
-# --- 6. ACTIVITY: TODAY'S PUZZLE ---
+# --- 6. ACTIVITY: TODAY'S PUZZLE (STILL AI) ---
 elif st.session_state.mode == "puzzle":
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
         with st.spinner("Thinking..."):
             try:
-                prompt = "Write a very simple riddle for an elementary student. Hide the answer below."
+                prompt = "Write a simple riddle for a child."
                 response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
                 st.info(response.text)
             except Exception:
-                st.warning("💤 The robot is busy right now!")
+                st.warning("💤 The robot is busy!")
 
 # --- 7. ACTIVITY: MATH MAGIC ---
 elif st.session_state.mode == "math":
@@ -169,7 +161,7 @@ elif st.session_state.mode == "math":
             if user_ans == st.session_state.math_problem['a']:
                 st.success("🌟 AMAZING! You got it right!")
             else:
-                st.warning("Try again! You can do it!")
+                st.warning("Try again!")
 
 # --- 8. ACTIVITY: FUN FACT ---
 elif st.session_state.mode == "fact":
@@ -177,7 +169,7 @@ elif st.session_state.mode == "fact":
     st.write("## 💡 Learning Time!")
     if st.button("🌟 GENERATE SURPRISE", use_container_width=True):
         try:
-            prompt = "One fun fact for today and one weird animal fact for kids."
+            prompt = "One fun fact for kids."
             response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
             st.success(response.text)
         except Exception:
