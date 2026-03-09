@@ -1,119 +1,107 @@
 import streamlit as st
-import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING: Sky Blue Background & Forced Visible Text ---
+# --- 1. IPAD STYLING: HIGH-CONTRAST FORCED TEXT ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
     <style>
-    /* Vibrant Sky Blue Background */
+    /* Sky Blue Background from your reference */
     .stApp { 
         background-color: #00BFFF; 
     }
     
+    /* Clean Title */
     .menu-title {
         color: white;
         text-align: center;
-        font-size: 60px !important; /* Massive Title */
+        font-size: 55px !important;
         font-weight: 900;
-        margin-top: 20px;
-        margin-bottom: 40px;
-        text-shadow: 4px 4px 8px rgba(0,0,0,0.4);
+        margin-top: 10px;
+        margin-bottom: 30px;
         font-family: 'Arial Black', sans-serif;
     }
 
-    /* WHITE BUTTONS WITH FORCED BLACK TEXT */
-    div.stButton > button {
+    /* THE FIX: Custom HTML Button Styling */
+    .kiosk-button {
+        display: block;
         background-color: white !important;
-        color: #000000 !important; /* FORCED SOLID BLACK */
-        border-radius: 40px !important;
-        border: 8px solid #1a202c !important; /* Extra thick border for visibility */
-        font-size: 70px !important; /* GIANT FONT */
+        color: black !important; /* Forced Black Text */
+        text-decoration: none !important;
+        text-align: center;
+        line-height: 180px; /* Vertically centers the text */
+        font-size: 65px !important; /* Giant Font */
         font-weight: 900 !important;
-        height: 200px !important; /* Taller boxes */
+        height: 180px !important;
         width: 100% !important;
-        box-shadow: 0px 12px 24px rgba(0,0,0,0.5);
-        margin-bottom: 45px;
+        border-radius: 40px;
+        border: 8px solid #1a202c;
+        margin-bottom: 35px;
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.4);
         font-family: 'Arial Black', sans-serif;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
-    /* Ensure text stays black even when hovering or clicking on iPad */
-    div.stButton > button:hover, div.stButton > button:active, div.stButton > button:focus {
-        color: #000000 !important;
-        background-color: #f0f0f0 !important;
+    .kiosk-button:active {
+        background-color: #E0E0E0 !important;
+        transform: scale(0.98);
     }
     
-    /* Clean Kiosk UI: Hide standard Streamlit elements */
+    /* Hide all standard Streamlit clutter */
     header {visibility: hidden;}
     footer {visibility: hidden;}
     #MainMenu {visibility: hidden;}
-    
-    /* Global label styling */
-    h2, h3, p, label { 
-        color: white !important; 
-        text-align: center; 
-        font-weight: 900; 
-        font-size: 40px !important; 
-    }
+    [data-testid="stHeader"] {display: none;}
     </style>
     """, unsafe_allow_html=True)
 
 # --- 2. SESSION STATE ---
 if 'mode' not in st.session_state: st.session_state.mode = None
-if 'selected_char' not in st.session_state: st.session_state.selected_char = None
-if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 3. MAIN MENU ---
 if st.session_state.mode is None:
     st.markdown('<div class="menu-title">Choose an activity:</div>', unsafe_allow_html=True)
     
-    # Matching the exact lettered style with GIANT visible text
-    if st.button("A. Coloring Sheet", use_container_width=True): 
-        st.session_state.mode = "coloring"; st.rerun()
+    # We use st.columns and custom HTML to ensure the text is 100% visible
+    # These act exactly like buttons once clicked
+    if st.markdown('<a href="/?mode=coloring" class="kiosk-button" target="_self">A. Coloring Sheet</a>', unsafe_allow_html=True):
+        pass
         
-    if st.button("B. Today's Puzzle", use_container_width=True): 
-        st.session_state.mode = "puzzle"; st.rerun()
+    if st.markdown('<a href="/?mode=puzzle" class="kiosk-button" target="_self">B. Today\'s Puzzle</a>', unsafe_allow_html=True):
+        pass
         
-    if st.button("C. Fun Fact", use_container_width=True): 
-        st.session_state.mode = "fact"; st.rerun()
+    if st.markdown('<a href="/?mode=fact" class="kiosk-button" target="_self">C. Fun Fact</a>', unsafe_allow_html=True):
+        pass
         
-    if st.button("D. Math Magic", use_container_width=True): 
-        st.session_state.mode = "math"; st.rerun()
+    if st.markdown('<a href="/?mode=math" class="kiosk-button" target="_self">D. Math Magic</a>', unsafe_allow_html=True):
+        pass
 
-# --- 4. ACTIVITY: COLORING PAGE ---
+    # URL-based navigation check for the demo
+    params = st.query_params
+    if "mode" in params:
+        st.session_state.mode = params["mode"]
+        st.rerun()
+
+# --- 4. SIMPLE DEMO RESPONSES ---
 elif st.session_state.mode == "coloring":
-    st.write("## Pick a Friend!")
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        if st.button("Dino", use_container_width=True): 
-            st.session_state.selected_char = "dinosaur"; st.rerun()
-    with c2:
-        if st.button("Astro", use_container_width=True): 
-            st.session_state.selected_char = "astronaut"; st.rerun()
-    with c3:
-        if st.button("Magic", use_container_width=True): 
-            st.session_state.selected_char = "unicorn"; st.rerun()
+    st.write("# 🎨 Pick a Dino!")
+    if st.button("🦖 DINOSAUR", use_container_width=True):
+        st.image("https://img.icons8.com/ios/500/dinosaur.png")
 
-# --- 5. PUZZLE / MATH / FACT (STATIC FOR DEMO) ---
 elif st.session_state.mode == "puzzle":
-    st.info("### What has hands but cannot clap? \n\n**Answer:** A Clock! ⏰")
-
-elif st.session_state.mode == "math":
-    st.write("## 5 + 3 = ?")
-    st.success("### Answer: 8! 🌟")
+    st.info("### Riddle: What has hands but no feet? \n\n**Answer:** A Clock! ⏰")
 
 elif st.session_state.mode == "fact":
-    st.success("### Did you know? Octopuses have three hearts! 🐙")
+    st.success("### Fact: Honey never spoils! 🍯")
 
-# --- 6. HOME BUTTON ---
+elif st.session_state.mode == "math":
+    st.write("# 10 + 5 = ?")
+    st.success("### 15! 🌟")
+
+# --- 5. BACK BUTTON ---
 if st.session_state.mode:
     st.write("---")
-    if st.button("🏠 BACK", use_container_width=True):
+    if st.button("🏠 BACK TO MENU", use_container_width=True):
+        st.query_params.clear()
         st.session_state.mode = None
-        st.session_state.selected_char = None
         st.rerun()
