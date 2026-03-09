@@ -5,7 +5,7 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING & SPIN ANIMATION ---
+# --- 1. IPAD STYLING & FORCED SPIN ---
 st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
@@ -15,12 +15,13 @@ st.markdown("""
     /* THE SPIN ANIMATION */
     @keyframes logo-spin {
         0% { transform: rotate(0deg); }
-        10% { transform: rotate(360deg); } /* Fast spin at the start of the interval */
-        100% { transform: rotate(360deg); } /* Stay still for the rest of the time */
+        10% { transform: rotate(360deg); } /* Fast spin for 1 second */
+        100% { transform: rotate(360deg); } /* Stay still for 9 seconds */
     }
 
-    .spinning-logo img {
-        animation: logo-spin 10s infinite ease-in-out;
+    /* Target the specific Streamlit image container directly */
+    [data-testid="stImage"] img {
+        animation: logo-spin 10s infinite ease-in-out !important;
         max-width: 100% !important;
         height: auto !important;
     }
@@ -70,10 +71,8 @@ if st.session_state.mode is None:
     if os.path.exists("logo.png"):
         _, mid, _ = st.columns([0.5, 5, 0.5])
         with mid:
-            # We wrap the image in a div with our 'spinning-logo' class
-            st.markdown('<div class="spinning-logo">', unsafe_allow_html=True)
+            # We no longer need the <div> wrap because we are targeting stImage directly
             st.image("logo.png", use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.markdown("<h1>🤖 My Creative Buddy</h1>", unsafe_allow_html=True)
     
