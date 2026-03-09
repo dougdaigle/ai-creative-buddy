@@ -1,12 +1,13 @@
 import streamlit as st
 import random
-import os
+import time
 
-# --- 1. IPAD STYLING: THE PERMANENT KIOSK LOOK ---
+# --- 1. IPAD STYLING: THE FINAL KIOSK DESIGN ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
     <style>
+    /* Full Sky Blue Background */
     .stApp { background-color: #00BFFF; }
     
     .kiosk-title {
@@ -20,7 +21,7 @@ st.markdown("""
         text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
     }
 
-    /* THE ICON BUTTON: Identical across all pages */
+    /* THE UNIVERSAL KIOSK BUTTON: Identical across all pages */
     .kiosk-link {
         display: flex;
         align-items: center;
@@ -52,6 +53,7 @@ st.markdown("""
         transform: scale(0.98);
     }
     
+    /* UI Cleanup */
     header, footer, #MainMenu, [data-testid="stHeader"] {visibility: hidden; display: none;}
     
     .instruction-text {
@@ -63,52 +65,55 @@ st.markdown("""
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
-    /* Worksheet Preview Frame */
+    /* Worksheet Frame */
     .worksheet-preview {
         background-color: white;
         padding: 15px;
         border-radius: 30px;
-        border: 5px solid #1a202c;
+        border: 8px solid #1a202c;
+        margin-bottom: 20px;
+        box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+    }
+    
+    /* Answer Box for Math/Puzzle */
+    .answer-box {
+        background-color: #FFF;
+        color: #1E3A8A;
+        padding: 25px;
+        border-radius: 20px;
+        font-size: 35px;
+        font-weight: 900;
+        border: 5px solid #1E3A8A;
         margin-bottom: 20px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. SESSION STATE ---
-if 'mode' not in st.session_state: st.session_state.mode = None
-if 'selected_animal' not in st.session_state: st.session_state.selected_animal = None
+# --- 2. NAVIGATION LOGIC ---
+params = st.query_params
+mode = params.get("mode", None)
+animal = params.get("animal", None)
+action = params.get("action", None)
 
-# --- 3. MAIN MENU (HOME PAGE) ---
-if st.session_state.mode is None:
+# --- 3. HOME PAGE ---
+if mode is None:
     st.markdown('<div class="kiosk-title">Current choice:</div>', unsafe_allow_html=True)
-    
     st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self"><span class="btn-icon">🎨</span> A. Color Sheet Maker</a>', unsafe_allow_html=True)
     st.markdown('<a href="/?mode=puzzle" class="kiosk-link" target="_self"><span class="btn-icon">🧩</span> B. Today\'s Puzzle</a>', unsafe_allow_html=True)
     st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">💡</span> C. Fun Fact</a>', unsafe_allow_html=True)
     st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self"><span class="btn-icon">➕</span> D. Math Magic</a>', unsafe_allow_html=True)
 
-    if "mode" in st.query_params:
-        st.session_state.mode = st.query_params["mode"]
-        st.query_params.clear()
-        st.rerun()
-
 # --- 4. OPTION A: COLOR SHEET MAKER ---
-elif st.session_state.mode == "coloring":
-    if st.session_state.selected_animal is None:
+elif mode == "coloring":
+    if animal is None:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
-        
-        # FORCED HTML BUTTONS (Identical to Home Page)
         st.markdown('<a href="/?mode=coloring&animal=Lion" class="kiosk-link" target="_self"><span class="btn-icon">🦁</span> LION</a>', unsafe_allow_html=True)
         st.markdown('<a href="/?mode=coloring&animal=Elephant" class="kiosk-link" target="_self"><span class="btn-icon">🐘</span> ELEPHANT</a>', unsafe_allow_html=True)
         st.markdown('<a href="/?mode=coloring&animal=Giraffe" class="kiosk-link" target="_self"><span class="btn-icon">🦒</span> GIRAFFE</a>', unsafe_allow_html=True)
-
-        if "animal" in st.query_params:
-            st.session_state.selected_animal = st.query_params["animal"]
-            st.query_params.clear()
-            st.rerun()
     else:
-        st.markdown(f'<div class="instruction-text">{st.session_state.selected_animal} Worksheet</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="instruction-text">{animal} Worksheet</div>', unsafe_allow_html=True)
         
+        # Static demo images
         animal_imgs = {
             "Lion": "http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_0",
             "Elephant": "http://googleusercontent.com/image_collection/image_retrieval/379734712510393884_2",
@@ -116,17 +121,52 @@ elif st.session_state.mode == "coloring":
         }
         
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        st.image(animal_imgs[st.session_state.selected_animal], use_container_width=True)
+        st.image(animal_imgs[animal], use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Back and Print buttons use the same kiosk style
-        if st.markdown('<a href="/?mode=coloring&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True):
-             pass
+        st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
         
-        if "action" in st.query_params:
-            st.success("Printing...")
-            st.query_params.clear()
+        if action == "print":
+            st.toast("🖨️ Sending to printer...", icon="🤖")
+            time.sleep(1)
+            st.success("Success! Pick it up at the desk.")
 
-    # Universal Back Button
-    st.write("---")
+# --- 5. OPTION B: TODAY'S PUZZLE ---
+elif mode == "puzzle":
+    st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
+    
+    riddle_text = "What has hands but cannot clap?"
+    answer_text = "Answer: A Clock! ⏰"
+    
+    st.markdown(f'<div class="answer-box">{riddle_text}</div>', unsafe_allow_html=True)
+    
+    if action == "reveal":
+        st.markdown(f'<div class="answer-box" style="background-color:#FFD700;">{answer_text}</div>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=puzzle&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT RIDDLE</a>', unsafe_allow_html=True)
+    else:
+        st.markdown('<a href="/?mode=puzzle&action=reveal" class="kiosk-link" target="_self"><span class="btn-icon">🔍</span> SHOW ANSWER</a>', unsafe_allow_html=True)
+    
+    if action == "print":
+        st.toast("Printing riddle card...", icon="🧩")
+
+# --- 6. OPTION D: MATH MAGIC ---
+elif mode == "math":
+    st.markdown('<div class="instruction-text">➕ Math Magic!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="kiosk-title" style="font-size:80px !important;">5 + 5 = ?</div>', unsafe_allow_html=True)
+    
+    if action == "reveal":
+        st.markdown('<div class="kiosk-title" style="font-size:100px !important; color:#FFD700;">10! 🌟</div>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self"><span class="btn-icon">🎲</span> NEW PROBLEM</a>', unsafe_allow_html=True)
+    else:
+        st.markdown('<a href="/?mode=math&action=reveal" class="kiosk-link" target="_self"><span class="btn-icon">🤔</span> CHECK ANSWER</a>', unsafe_allow_html=True)
+
+# --- 7. OPTION C: FUN FACT ---
+elif mode == "fact":
+    st.markdown('<div class="instruction-text">💡 Fun Fact!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="answer-box">Octopuses have three hearts! 🐙</div>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">🌟</span> NEXT FACT</a>', unsafe_allow_html=True)
+
+# --- UNIVERSAL BACK BUTTON ---
+if mode is not None:
+    st.write("")
     st.markdown('<a href="/" class="kiosk-link" target="_self"><span class="btn-icon">🏠</span> BACK TO MENU</a>', unsafe_allow_html=True)
