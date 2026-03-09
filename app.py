@@ -1,22 +1,11 @@
 import streamlit as st
 from google import genai
 from google.genai import types
-from streamlit_lottie import st_lottie
-import requests
 import datetime
 import random
 
-# --- 1. IPAD STYLING & ANIMATION SETUP ---
-st.set_page_config(page_title="My Creative Buddy", layout="centered")
-
-def load_lottie(url):
-    r = requests.get(url)
-    if r.status_code != 200: return None
-    return r.json()
-
-# Load a fun celebration animation
-confetti_url = "https://assets5.lottiefiles.com/packages/lf20_u4yrau.json"
-lottie_celebration = load_lottie(confetti_url)
+# --- 1. IPAD STYLING ---
+st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
     <style>
@@ -42,7 +31,7 @@ try:
     api_key = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=api_key)
 except Exception:
-    st.error("🔑 API Key Missing!")
+    st.error("🔑 API Key Missing! Check Streamlit Secrets.")
     st.stop()
 
 # --- 3. SESSION STATE ---
@@ -52,14 +41,18 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 4. MAIN MENU ---
 if st.session_state.mode is None:
-    st.title("🤖 My Creative Buddy!")
-    st.write("### Choose an activity:")
+    st.title("🤖 My Creative Buddy")
+    st.write("### AI Exploration for Kids") # Your New Slogan
+    
+    # 5-Button Layout
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🎨 Coloring Page", use_container_width=True): 
             st.session_state.mode = "coloring"; st.rerun()
         if st.button("🧩 Today's Puzzle", use_container_width=True): 
             st.session_state.mode = "puzzle"; st.rerun()
+        if st.button("📖 Story Starter", use_container_width=True): 
+            st.session_state.mode = "story"; st.rerun()
     with col2:
         if st.button("💡 Fun Fact", use_container_width=True): 
             st.session_state.mode = "fact"; st.rerun()
@@ -100,19 +93,34 @@ elif st.session_state.mode == "coloring":
                 except Exception:
                     st.warning("💤 The robot is taking a nap. Try again in 1 minute!")
 
-# --- 6. ACTIVITY: TODAY'S PUZZLE ---
+# --- 6. ACTIVITY: STORY STARTER ---
+elif st.session_state.mode == "story":
+    st.write("## 📖 Start Your Adventure")
+    topic = st.text_input("What should the story be about?", placeholder="Ex: A talking taco...")
+    if st.button("✨ WRITE THE START", use_container_width=True):
+        with st.spinner("Thinking of a story..."):
+            try:
+                prompt = f"Write the first 3 sentences of a fun story about {topic} for a child. End with 'What happens next?'"
+                response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
+                st.info(response.text)
+                st.button("🖨️ PRINT STORY SHEET", use_container_width=True)
+            except Exception:
+                st.warning("💤 The robot is busy!")
+
+# --- 7. ACTIVITY: TODAY'S PUZZLE ---
 elif st.session_state.mode == "puzzle":
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
         with st.spinner("Thinking..."):
             try:
-                prompt = "Write a very simple riddle for an elementary student. Emojis included!"
+                prompt = "Write a very simple riddle for an elementary student. Give the riddle first, then hide the answer far below."
                 response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
                 st.info(response.text)
+                st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
             except Exception:
                 st.warning("💤 The robot is busy right now!")
 
-# --- 7. ACTIVITY: MATH MAGIC (CELEBRATION ONLY) ---
+# --- 8. ACTIVITY: MATH MAGIC ---
 elif st.session_state.mode == "math":
     st.write("## ➕ Math Magic!")
     topic = st.radio("Choose a topic:", ["Counting", "Addition", "Subtraction"], horizontal=True)
@@ -125,30 +133,27 @@ elif st.session_state.mode == "math":
         else:
             high, low = max(num1, num2), min(num1, num2)
             st.session_state.math_problem = {"q": f"What is {high} - {low}?", "a": high - low}
-
     if st.session_state.math_problem:
         st.write(f"### {st.session_state.math_problem['q']}")
         user_ans = st.number_input("Your Answer:", min_value=0, step=1)
         if st.button("✅ CHECK ANSWER", use_container_width=True):
             if user_ans == st.session_state.math_problem['a']:
-                # SHOW ANIMATION
-                st_lottie(lottie_celebration, height=200, key="success_anim")
                 st.success("🌟 AMAZING! You got it right!")
             else:
                 st.warning("Try again! You can do it!")
 
-# --- 8. ACTIVITY: FUN FACT ---
+# --- 9. ACTIVITY: FUN FACT ---
 elif st.session_state.mode == "fact":
     st.write("## 💡 Learning Time!")
     if st.button("🌟 GENERATE SURPRISE", use_container_width=True):
         try:
-            prompt = "One fun fact for today and one weird animal fact for kids."
+            prompt = "One fun fact for today's date and one weird animal fact for kids. Use emojis!"
             response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
             st.success(response.text)
         except Exception:
             st.warning("💤 Robot is busy!")
 
-# --- 9. HOME BUTTON ---
+# --- 10. HOME BUTTON ---
 if st.session_state.mode:
     st.write("---")
     if st.button("🏠 START OVER", use_container_width=True, key="main_reset"):
