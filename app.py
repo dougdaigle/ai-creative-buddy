@@ -5,15 +5,26 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING (BIGGER LOGO & TOUCH OPTIMIZED) ---
+# --- 1. IPAD STYLING & SPIN ANIMATION ---
 st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
     <style>
-    /* Soft background for blending */
     .stApp { background-color: #F8FAFF; }
     
-    /* REMOVE THE WHITE BOX: Targeting the image container specifically */
+    /* THE SPIN ANIMATION */
+    @keyframes logo-spin {
+        0% { transform: rotate(0deg); }
+        10% { transform: rotate(360deg); } /* Fast spin at the start of the interval */
+        100% { transform: rotate(360deg); } /* Stay still for the rest of the time */
+    }
+
+    .spinning-logo img {
+        animation: logo-spin 10s infinite ease-in-out;
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
     [data-testid="stImage"] {
         background-color: transparent !important;
         border: none !important;
@@ -22,15 +33,8 @@ st.markdown("""
         justify-content: center;
     }
 
-    /* Force the image to be larger than standard Streamlit limits */
-    [data-testid="stImage"] img {
-        max-width: 100% !important;
-        height: auto !important;
-    }
-
     h1, h3 { color: #1E3A8A; text-align: center; }
 
-    /* Solid Button Layout for iPad Touch */
     div.stButton > button {
         border-radius: 20px;
         border: 3px solid #1E3A8A;
@@ -53,7 +57,7 @@ try:
     api_key = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=api_key)
 except Exception:
-    st.error("🔑 API Key Missing! Check Streamlit Secrets.")
+    st.error("🔑 API Key Missing!")
     st.stop()
 
 # --- 3. SESSION STATE ---
@@ -63,11 +67,13 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 4. MAIN MENU ---
 if st.session_state.mode is None:
-    # Display Logo significantly larger using a 5:1 ratio for the center
     if os.path.exists("logo.png"):
         _, mid, _ = st.columns([0.5, 5, 0.5])
         with mid:
+            # We wrap the image in a div with our 'spinning-logo' class
+            st.markdown('<div class="spinning-logo">', unsafe_allow_html=True)
             st.image("logo.png", use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.markdown("<h1>🤖 My Creative Buddy</h1>", unsafe_allow_html=True)
     
