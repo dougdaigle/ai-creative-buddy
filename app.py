@@ -3,49 +3,27 @@ from google import genai
 from google.genai import types
 import datetime
 
-# --- 1. IPAD & TOUCH OPTIMIZATION (CSS) ---
+# --- 1. IPAD STYLING ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
     <style>
-    /* Full-screen feel for iPad */
-    .stApp { 
-        background-color: #F0F5FF; 
-        padding-top: 0rem;
-    }
+    .stApp { background-color: #F0F5FF; }
+    h1, h2, h3 { color: #1E3A8A; text-align: center; }
     
-    /* Make titles very clear and centered */
-    h1, h2, h3 { 
-        color: #1E3A8A; 
-        text-align: center; 
-        font-family: 'Arial', sans-serif;
-    }
-
-    /* iPad Touch Optimization: Massive Buttons */
+    /* Massive Touch Buttons for iPad */
     div.stButton > button {
         border-radius: 20px;
         border: 3px solid #1E3A8A;
         background-color: white;
         color: #1a202c;
         font-weight: bold;
-        font-size: 22px !important;
-        height: 100px !important; /* Fixed height for touch consistency */
-        margin-bottom: 10px;
-        box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+        font-size: 20px !important;
+        height: 80px !important;
+        use-container-width: true;
     }
-
-    /* Image labels for the coloring page */
-    .stMarkdown p {
-        text-align: center;
-        font-weight: bold;
-        color: #1E3A8A;
-        font-size: 18px;
-    }
-
-    /* Hide the top bar and "Made with Streamlit" for a clean kiosk look */
     header {visibility: hidden;}
     footer {visibility: hidden;}
-    #MainMenu {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -54,49 +32,56 @@ try:
     api_key = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=api_key)
 except Exception:
-    st.error("🔑 API Key Missing in Secrets!")
+    st.error("🔑 API Key Missing!")
     st.stop()
 
-# --- 3. APP LOGIC ---
+# --- 3. SESSION STATE INITIALIZATION ---
+# This part "remembers" what the kid clicked so we don't need double-clicks
 if 'mode' not in st.session_state:
     st.session_state.mode = None
 if 'selected_char' not in st.session_state:
     st.session_state.selected_char = None
 
-st.title("🤖 My Creative Buddy!")
-
 # --- 4. MAIN MENU ---
 if st.session_state.mode is None:
+    st.title("🤖 My Creative Buddy!")
     st.write("### Choose an activity:")
-    # On iPad, stacked buttons or a clean grid work best
     if st.button("🎨 Coloring Page", use_container_width=True): 
         st.session_state.mode = "coloring"
+        st.rerun() # Instant switch
     if st.button("📸 Face Caricature", use_container_width=True): 
         st.session_state.mode = "caricature"
+        st.rerun()
     if st.button("💡 Fun Fact", use_container_width=True): 
         st.session_state.mode = "fact"
+        st.rerun()
 
 # --- 5. ACTIVITY: COLORING PAGE ---
 elif st.session_state.mode == "coloring":
-    st.write("## 1. Pick a Friend!")
-    # Using 3 columns for the pictures to fit iPad width perfectly
-    char_col1, char_col2, char_col3 = st.columns(3)
-    
-    with char_col1:
-        st.image("https://img.icons8.com/color/200/dinosaur.png", use_container_width=True)
-        if st.button("Dinosaur", use_container_width=True): 
-            st.session_state.selected_char = "a friendly dinosaur"
-    with char_col2:
-        st.image("https://img.icons8.com/color/200/astronaut-helmet.png", use_container_width=True)
-        if st.button("Astronaut", use_container_width=True): 
-            st.session_state.selected_char = "a brave astronaut"
-    with char_col3:
-        st.image("https://img.icons8.com/color/200/unicorn.png", use_container_width=True)
-        if st.button("Unicorn", use_container_width=True): 
-            st.session_state.selected_char = "a magic unicorn"
+    # If no character is picked yet, show the gallery
+    if st.session_state.selected_char is None:
+        st.write("## 1. Pick a Friend!")
+        char_col1, char_col2, char_col3 = st.columns(3)
+        
+        with char_col1:
+            st.image("https://img.icons8.com/color/200/dinosaur.png", use_container_width=True)
+            if st.button("Dinosaur", use_container_width=True): 
+                st.session_state.selected_char = "a friendly dinosaur"
+                st.rerun() # This forces the immediate jump to the draw screen
+        with char_col2:
+            st.image("https://img.icons8.com/color/200/astronaut-helmet.png", use_container_width=True)
+            if st.button("Astronaut", use_container_width=True): 
+                st.session_state.selected_char = "a brave astronaut"
+                st.rerun()
+        with char_col3:
+            st.image("https://img.icons8.com/color/200/unicorn.png", use_container_width=True)
+            if st.button("Unicorn", use_container_width=True): 
+                st.session_state.selected_char = "a magic unicorn"
+                st.rerun()
 
-    if st.session_state.selected_char:
-        st.markdown(f"### Ready to draw your **{st.session_state.selected_char}**?")
+    # Once a character is picked, show the "Generate" screen
+    else:
+        st.markdown(f"### Ready to draw your **{st.session_state.selected_char.upper()}**?")
         if st.button("✨ MAKE MY PAGE ✨", use_container_width=True):
             with st.spinner("Drawing..."):
                 try:
@@ -110,7 +95,14 @@ elif st.session_state.mode == "coloring":
                             st.image(part.as_image(), use_container_width=True)
                             st.button("🖨️ PRINT NOW", use_container_width=True)
                 except Exception as e:
-                    st.error("Robot is busy! Make sure billing is enabled in AI Studio.")
+                    if "429" in str(e):
+                        st.warning("💤 Robot is napping. Wait 1 minute!")
+                    else:
+                        st.error("Robot error! Please check billing in AI Studio.")
+        
+        if st.button("⬅️ Pick a different character", use_container_width=True):
+            st.session_state.selected_char = None
+            st.rerun()
 
 # --- 6. ACTIVITY: FUN FACT ---
 elif st.session_state.mode == "fact":
@@ -125,10 +117,10 @@ elif st.session_state.mode == "fact":
                 st.markdown(f"### {today} is special!")
                 st.success(response.text)
                 st.button("🖨️ PRINT FACT STRIP", use_container_width=True)
-            except Exception as e:
+            except Exception:
                 st.error("The robot forgot its history book!")
 
-# --- 7. HOME BUTTON (Standardized for iPad) ---
+# --- 7. HOME BUTTON ---
 if st.session_state.mode is not None:
     st.write("---")
     if st.button("🏠 START OVER", use_container_width=True):
