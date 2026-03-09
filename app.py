@@ -5,22 +5,24 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING (REVERTED) ---
+# --- 1. IPAD STYLING (CLEAN & TRANSPARENT) ---
 st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
     <style>
+    /* Soft background to blend with transparent logo */
     .stApp { background-color: #F8FAFF; }
     
-    /* Center the logo */
-    .header-container {
-        text-align: center;
-        margin-bottom: 20px;
+    /* Ensure the logo container has no background or border */
+    [data-testid="stImage"] {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 
-    h1 { color: #1E3A8A; text-align: center; margin-bottom: 5px; }
+    h1, h3 { color: #1E3A8A; text-align: center; }
 
-    /* iPad Touch Optimization: Solid Borders Reinstated */
+    /* Solid Button Layout for iPad Touch */
     div.stButton > button {
         border-radius: 20px;
         border: 3px solid #1E3A8A;
@@ -30,7 +32,6 @@ st.markdown("""
         font-size: 22px !important;
         height: 90px !important;
         margin-bottom: 15px;
-        box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
     }
     
     header {visibility: hidden;}
@@ -54,13 +55,13 @@ if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
 # --- 4. MAIN MENU ---
 if st.session_state.mode is None:
-    # Display Logo
+    # Display Logo with no background box
     if os.path.exists("logo.png"):
-        _, mid, _ = st.columns([1, 2, 1])
+        _, mid, _ = st.columns([1, 3, 1])
         with mid:
             st.image("logo.png", use_container_width=True)
     else:
-        st.markdown("<h1 style='text-align: center;'>🤖 My Creative Buddy</h1>", unsafe_allow_html=True)
+        st.markdown("<h1>🤖 My Creative Buddy</h1>", unsafe_allow_html=True)
     
     st.write("### Choose an activity:")
     col1, col2 = st.columns(2)
@@ -107,7 +108,7 @@ elif st.session_state.mode == "coloring":
                             st.image(part.as_image(), use_container_width=True)
                             st.button("🖨️ PRINT NOW", use_container_width=True)
                 except Exception:
-                    st.warning("💤 The robot is taking a nap. Try again in 1 minute!")
+                    st.warning("💤 The robot is taking a nap!")
 
 # --- 6. ACTIVITY: TODAY'S PUZZLE ---
 elif st.session_state.mode == "puzzle":
@@ -115,10 +116,9 @@ elif st.session_state.mode == "puzzle":
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
         with st.spinner("Thinking..."):
             try:
-                prompt = "Write a very simple riddle for an elementary student. Give the riddle first, then hide the answer far below."
+                prompt = "Write a very simple riddle for an elementary student. Hide the answer below."
                 response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
                 st.info(response.text)
-                st.button("🖨️ PRINT RIDDLE CARD", use_container_width=True)
             except Exception:
                 st.warning("💤 The robot is busy right now!")
 
@@ -149,11 +149,11 @@ elif st.session_state.mode == "fact":
     st.write("## 💡 Learning Time!")
     if st.button("🌟 GENERATE SURPRISE", use_container_width=True):
         try:
-            prompt = "One fun fact for today's date and one weird animal fact for kids. Use emojis!"
+            prompt = "One fun fact for today and one weird animal fact for kids."
             response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
             st.success(response.text)
         except Exception:
-            st.warning("💤 Robot is busy! Try again soon.")
+            st.warning("💤 Robot is busy!")
 
 # --- 9. HOME BUTTON ---
 if st.session_state.mode:
