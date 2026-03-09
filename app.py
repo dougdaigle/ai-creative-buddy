@@ -60,7 +60,7 @@ if 'mode' not in st.session_state: st.session_state.mode = None
 
 # --- 3. MAIN MENU ---
 if st.session_state.mode is None:
-    st.markdown('<div class="menu-title">Choose an activity:</div>', unsafe_allow_html=True)
+    st.markdown('<div class="menu-title">Current Choice:</div>', unsafe_allow_html=True)
     
     # We use st.columns and custom HTML to ensure the text is 100% visible
     # These act exactly like buttons once clicked
