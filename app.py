@@ -14,9 +14,7 @@ def load_lottie(url):
     if r.status_code != 200: return None
     return r.json()
 
-# Load a fun celebration animation
-confetti_url = "https://assets5.lottiefiles.com/packages/lf20_u4yrau.json"
-lottie_celebration = load_lottie(confetti_url)
+lottie_celebration = load_lottie("https://assets5.lottiefiles.com/packages/lf20_u4yrau.json")
 
 st.markdown("""
     <style>
@@ -45,15 +43,30 @@ except Exception:
     st.error("🔑 API Key Missing!")
     st.stop()
 
-# --- 3. SESSION STATE ---
+# --- 3. SESSION STATE (The Star Chart Logic) ---
 if 'mode' not in st.session_state: st.session_state.mode = None
 if 'selected_char' not in st.session_state: st.session_state.selected_char = None
 if 'math_problem' not in st.session_state: st.session_state.math_problem = None
 
-# --- 4. MAIN MENU ---
+# Track stars for each activity
+if 'stars' not in st.session_state:
+    st.session_state.stars = {"Color": False, "Fact": False, "Puzzle": False, "Math": False}
+
+# --- 4. THE STAR CHART DISPLAY ---
+def show_star_chart():
+    st.write("### 🌟 Your Progress 🌟")
+    cols = st.columns(4)
+    for i, (activity, done) in enumerate(st.session_state.stars.items()):
+        with cols[i]:
+            icon = "⭐" if done else "⚪"
+            st.markdown(f"<h2 style='text-align: center;'>{icon}</h2>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>{activity}</p>", unsafe_allow_html=True)
+
+# --- 5. MAIN MENU ---
 if st.session_state.mode is None:
     st.title("🤖 My Creative Buddy!")
-    st.write("### Choose an activity:")
+    show_star_chart()
+    st.write("---")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🎨 Coloring Page", use_container_width=True): 
@@ -66,7 +79,7 @@ if st.session_state.mode is None:
         if st.button("➕ Math Magic", use_container_width=True): 
             st.session_state.mode = "math"; st.rerun()
 
-# --- 5. ACTIVITY: COLORING PAGE ---
+# --- 6. ACTIVITY: COLORING PAGE ---
 elif st.session_state.mode == "coloring":
     if st.session_state.selected_char is None:
         st.write("## 1. Pick a Friend!")
@@ -96,23 +109,24 @@ elif st.session_state.mode == "coloring":
                     for part in response.parts:
                         if part.inline_data:
                             st.image(part.as_image(), use_container_width=True)
+                            st.session_state.stars["Color"] = True # Earn a star!
                             st.button("🖨️ PRINT NOW", use_container_width=True)
                 except Exception:
-                    st.warning("💤 The robot is taking a nap. Try again in 1 minute!")
+                    st.warning("💤 The robot is taking a nap!")
 
-# --- 6. ACTIVITY: TODAY'S PUZZLE ---
+# --- 7. ACTIVITY: TODAY'S PUZZLE ---
 elif st.session_state.mode == "puzzle":
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
-        with st.spinner("Thinking..."):
-            try:
-                prompt = "Write a very simple riddle for an elementary student. Emojis included!"
-                response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
-                st.info(response.text)
-            except Exception:
-                st.warning("💤 The robot is busy right now!")
+        try:
+            prompt = "A simple riddle for a child. Include the answer hidden at the bottom."
+            response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
+            st.info(response.text)
+            st.session_state.stars["Puzzle"] = True # Earn a star!
+        except Exception:
+            st.warning("💤 The robot is busy!")
 
-# --- 7. ACTIVITY: MATH MAGIC (CELEBRATION ONLY) ---
+# --- 8. ACTIVITY: MATH MAGIC ---
 elif st.session_state.mode == "math":
     st.write("## ➕ Math Magic!")
     topic = st.radio("Choose a topic:", ["Counting", "Addition", "Subtraction"], horizontal=True)
@@ -131,28 +145,31 @@ elif st.session_state.mode == "math":
         user_ans = st.number_input("Your Answer:", min_value=0, step=1)
         if st.button("✅ CHECK ANSWER", use_container_width=True):
             if user_ans == st.session_state.math_problem['a']:
-                # SHOW ANIMATION
-                st_lottie(lottie_celebration, height=200, key="success_anim")
+                st_lottie(lottie_celebration, height=200, key="math_celebration")
                 st.success("🌟 AMAZING! You got it right!")
+                st.session_state.stars["Math"] = True # Earn a star!
             else:
                 st.warning("Try again! You can do it!")
 
-# --- 8. ACTIVITY: FUN FACT ---
+# --- 9. ACTIVITY: FUN FACT ---
 elif st.session_state.mode == "fact":
     st.write("## 💡 Learning Time!")
     if st.button("🌟 GENERATE SURPRISE", use_container_width=True):
         try:
-            prompt = "One fun fact for today and one weird animal fact for kids."
+            prompt = "One fun fact for kids."
             response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
             st.success(response.text)
+            st.session_state.stars["Fact"] = True # Earn a star!
         except Exception:
             st.warning("💤 Robot is busy!")
 
-# --- 9. HOME BUTTON ---
+# --- 10. HOME BUTTON (Wipes everything for the next student) ---
 if st.session_state.mode:
     st.write("---")
     if st.button("🏠 START OVER", use_container_width=True, key="main_reset"):
+        # Reset everything back to default
         st.session_state.mode = None
         st.session_state.selected_char = None
         st.session_state.math_problem = None
+        st.session_state.stars = {"Color": False, "Fact": False, "Puzzle": False, "Math": False}
         st.rerun()
