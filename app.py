@@ -5,22 +5,22 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING: SELECTIVE SPIN & GOLD PULSE ---
+# --- 1. IPAD STYLING: REFINED SELECTORS ---
 st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
     <style>
     .stApp { background-color: #F8FAFF; }
     
-    /* 1. LOGO SPIN ANIMATION (Targeted to the header area only) */
+    /* 1. THE LOGO SPIN ANIMATION */
     @keyframes logo-spin {
         0% { transform: rotate(0deg); }
         10% { transform: rotate(360deg); } 
         100% { transform: rotate(360deg); } 
     }
 
-    /* This selector only targets the logo on the Home Page */
-    .home-logo img {
+    /* Target ONLY the specific image with our custom ID */
+    #home-logo img {
         animation: logo-spin 10s infinite ease-in-out !important;
         max-width: 100% !important;
         height: auto !important;
@@ -46,7 +46,7 @@ st.markdown("""
         animation: gold-glow 5s infinite ease-in-out;
     }
 
-    /* Ensure all image containers remain transparent */
+    /* General cleanup for images */
     [data-testid="stImage"] {
         background-color: transparent !important;
         border: none !important;
@@ -78,8 +78,8 @@ if st.session_state.mode is None:
     if os.path.exists("logo.png"):
         _, mid, _ = st.columns([0.5, 5, 0.5])
         with mid:
-            # Wrapped in a div class 'home-logo' so ONLY this image spins
-            st.markdown('<div class="home-logo">', unsafe_allow_html=True)
+            # Using an HTML container with a specific ID to "trap" the animation
+            st.markdown('<div id="home-logo">', unsafe_allow_html=True)
             st.image("logo.png", use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
     else:
@@ -100,6 +100,7 @@ if st.session_state.mode is None:
 
 # --- 5. ACTIVITY: COLORING PAGE (DEMO MODE) ---
 elif st.session_state.mode == "coloring":
+    # Disable pulsing for child selection
     st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     
     if st.session_state.selected_char is None:
@@ -127,7 +128,7 @@ elif st.session_state.mode == "coloring":
                     "astronaut": "https://img.icons8.com/ios/500/astronaut-helmet.png",
                     "unicorn": "https://img.icons8.com/ios/500/unicorn.png"
                 }
-                # No 'home-logo' class here, so these stay static
+                # No 'home-logo' ID here, so it WON'T spin
                 st.image(demo_images[st.session_state.selected_char], use_container_width=True)
                 st.button("🖨️ PRINT NOW", use_container_width=True)
 
