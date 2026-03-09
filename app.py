@@ -5,25 +5,46 @@ import datetime
 import random
 import os
 
-# --- 1. IPAD STYLING & FORCED SPIN ---
+# --- 1. IPAD STYLING: LOGO SPIN & GOLD PULSE ---
 st.set_page_config(page_title="AI Exploration for Kids", layout="centered")
 
 st.markdown("""
     <style>
     .stApp { background-color: #F8FAFF; }
     
-    /* THE SPIN ANIMATION */
+    /* 1. LOGO SPIN ANIMATION */
     @keyframes logo-spin {
         0% { transform: rotate(0deg); }
-        10% { transform: rotate(360deg); } /* Fast spin for 1 second */
-        100% { transform: rotate(360deg); } /* Stay still for 9 seconds */
+        10% { transform: rotate(360deg); } 
+        100% { transform: rotate(360deg); } 
     }
 
-    /* Target the specific Streamlit image container directly */
     [data-testid="stImage"] img {
         animation: logo-spin 10s infinite ease-in-out !important;
         max-width: 100% !important;
         height: auto !important;
+    }
+
+    /* 2. GOLD BUTTON PULSE ANIMATION */
+    @keyframes gold-glow {
+        0% { border-color: #1E3A8A; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); }
+        50% { border-color: #FFD700; box-shadow: 0px 0px 20px #FFD700; transform: scale(1.02); }
+        100% { border-color: #1E3A8A; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); }
+    }
+
+    /* Applying the pulse to all main menu buttons */
+    div.stButton > button {
+        border-radius: 20px;
+        border: 3px solid #1E3A8A;
+        background-color: white;
+        color: #1a202c;
+        font-weight: bold;
+        font-size: 22px !important;
+        height: 90px !important;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+        /* Pulsing every 5 seconds to stay dynamic */
+        animation: gold-glow 5s infinite ease-in-out;
     }
 
     [data-testid="stImage"] {
@@ -35,17 +56,6 @@ st.markdown("""
     }
 
     h1, h3 { color: #1E3A8A; text-align: center; }
-
-    div.stButton > button {
-        border-radius: 20px;
-        border: 3px solid #1E3A8A;
-        background-color: white;
-        color: #1a202c;
-        font-weight: bold;
-        font-size: 22px !important;
-        height: 90px !important;
-        margin-bottom: 15px;
-    }
     
     header {visibility: hidden;}
     footer {visibility: hidden;}
@@ -71,7 +81,6 @@ if st.session_state.mode is None:
     if os.path.exists("logo.png"):
         _, mid, _ = st.columns([0.5, 5, 0.5])
         with mid:
-            # We no longer need the <div> wrap because we are targeting stImage directly
             st.image("logo.png", use_container_width=True)
     else:
         st.markdown("<h1>🤖 My Creative Buddy</h1>", unsafe_allow_html=True)
@@ -91,6 +100,9 @@ if st.session_state.mode is None:
 
 # --- 5. ACTIVITY: COLORING PAGE ---
 elif st.session_state.mode == "coloring":
+    # Disable pulsing for child-selection buttons so they can focus
+    st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
+    
     if st.session_state.selected_char is None:
         st.write("## 1. Pick a Friend!")
         c1, c2, c3 = st.columns(3)
@@ -125,6 +137,7 @@ elif st.session_state.mode == "coloring":
 
 # --- 6. ACTIVITY: TODAY'S PUZZLE ---
 elif st.session_state.mode == "puzzle":
+    st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## 🧩 The Robot's Riddle")
     if st.button("🎲 GET A NEW RIDDLE", use_container_width=True):
         with st.spinner("Thinking..."):
@@ -137,6 +150,7 @@ elif st.session_state.mode == "puzzle":
 
 # --- 7. ACTIVITY: MATH MAGIC ---
 elif st.session_state.mode == "math":
+    st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## ➕ Math Magic!")
     topic = st.radio("Choose a topic:", ["Counting", "Addition", "Subtraction"], horizontal=True)
     if st.button("📝 GENERATE PROBLEM", use_container_width=True):
@@ -159,6 +173,7 @@ elif st.session_state.mode == "math":
 
 # --- 8. ACTIVITY: FUN FACT ---
 elif st.session_state.mode == "fact":
+    st.markdown("<style>button { animation: none !important; }</style>", unsafe_allow_html=True)
     st.write("## 💡 Learning Time!")
     if st.button("🌟 GENERATE SURPRISE", use_container_width=True):
         try:
