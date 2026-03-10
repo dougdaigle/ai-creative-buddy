@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit st
 import random
 import time
 import os
@@ -127,27 +127,49 @@ if not mode:
 elif mode == "coloring":
     if not animal:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
+        
+        # 14 SELECTIONS
         st.markdown('<a href="/?mode=coloring&animal=Dino" class="kiosk-link" target="_self"><span class="btn-icon">🦖</span> Dino</a>', unsafe_allow_html=True)
         st.markdown('<a href="/?mode=coloring&animal=Lion" class="kiosk-link" target="_self"><span class="btn-icon">🦁</span> Lion</a>', unsafe_allow_html=True)
         st.markdown('<a href="/?mode=coloring&animal=Elephant" class="kiosk-link" target="_self"><span class="btn-icon">🐘</span> Elephant</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Giraffe" class="kiosk-link" target="_self"><span class="btn-icon">🦒</span> Giraffe</a>', unsafe_allow_html=True)
         st.markdown('<a href="/?mode=coloring&animal=Tiger" class="kiosk-link" target="_self"><span class="btn-icon">🐯</span> Tiger</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Zebra" class="kiosk-link" target="_self"><span class="btn-icon">🦓</span> Zebra</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Monkey" class="kiosk-link" target="_self"><span class="btn-icon">🐒</span> Monkey</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Shark" class="kiosk-link" target="_self"><span class="btn-icon">🦈</span> Shark</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Octopus" class="kiosk-link" target="_self"><span class="btn-icon">🐙</span> Octopus</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Frog" class="kiosk-link" target="_self"><span class="btn-icon">🐸</span> Frog</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Panda" class="kiosk-link" target="_self"><span class="btn-icon">🐼</span> Panda</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Cat" class="kiosk-link" target="_self"><span class="btn-icon">🐱</span> Cat</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Dog" class="kiosk-link" target="_self"><span class="btn-icon">🐶</span> Dog</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Rabbit" class="kiosk-link" target="_self"><span class="btn-icon">🐰</span> Rabbit</a>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
-        # MAPPING & FILE CHECKING
+        # Safe File Handling for the custom Dino image
         dino_file = "Dinosaur adventure in a prehistoric world.jpg"
         
         animal_imgs = {
             "Dino": dino_file if os.path.exists(dino_file) else "https://img.icons8.com/ios/500/dinosaur.png",
             "Lion": "https://img.icons8.com/ios/500/lion.png",
             "Elephant": "https://img.icons8.com/ios/500/elephant.png",
-            "Tiger": "https://img.icons8.com/ios/500/tiger-side-view.png"
+            "Giraffe": "https://img.icons8.com/ios/500/giraffe.png",
+            "Tiger": "https://img.icons8.com/ios/500/tiger-side-view.png",
+            "Zebra": "https://img.icons8.com/ios/500/zebra.png",
+            "Monkey": "https://img.icons8.com/ios/500/monkey.png",
+            "Shark": "https://img.icons8.com/ios/500/shark.png",
+            "Octopus": "https://img.icons8.com/ios/500/octopus.png",
+            "Frog": "https://img.icons8.com/ios/500/frog.png",
+            "Panda": "https://img.icons8.com/ios/500/panda.png",
+            "Cat": "https://img.icons8.com/ios/500/cat.png",
+            "Dog": "https://img.icons8.com/ios/500/dog.png",
+            "Rabbit": "https://img.icons8.com/ios/500/rabbit.png"
         }
         
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        # Safe Retrieval to prevent crash
-        display_img = animal_imgs.get(animal, "https://img.icons8.com/ios/500/image.png")
-        st.image(display_img, use_container_width=True)
+        # Safe display to prevent red error box
+        target_img = animal_imgs.get(animal, "https://img.icons8.com/ios/500/image.png")
+        st.image(target_img, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
@@ -156,7 +178,7 @@ elif mode == "coloring":
             st.toast("🖨️ Sending to printer...", icon="🤖")
             st.success("Success! Pick up your page at the desk.")
 
-# --- 6-8 (PUZZLE, MATH, FACT remain exactly the same as provided) ---
+# --- 6-8 (PUZZLE, MATH, FACT are identical to previous) ---
 elif mode == "puzzle":
     st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
     st.markdown('<div class="answer-box">What has hands but cannot clap?</div>', unsafe_allow_html=True)
