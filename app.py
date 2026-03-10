@@ -1,157 +1,135 @@
 import streamlit as st
 import os
 
-# --- 1. IPAD STYLING: REVERTED TO EXACT ORIGINAL LOOK ---
+# --- 1. IPAD STYLING: REVERTED TO EXACT ORIGINAL PILL LOOK ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
     <style>
-    /* Full Sky Blue Background */
+    /* Sky Blue Background */
     .stApp { background-color: #00BFFF; }
     
     /* THE FLOATING BACK BUTTON: Fixed to Top-Left */
-    .floating-back-container {
+    .floating-back {
         position: fixed;
         top: 20px;
         left: 20px;
-        z-index: 99999;
-    }
-    
-    /* Make the Back Button match your original small floating style */
-    .floating-back-container div.stButton > button {
         background-color: white !important;
         color: black !important;
-        padding: 12px 24px !important;
+        text-decoration: none !important;
+        padding: 12px 24px;
         font-size: 30px !important;
         font-weight: 900 !important;
-        border-radius: 20px !important;
-        border: 5px solid #1a202c !important;
-        width: auto !important;
-        min-height: 10px !important;
-        height: auto !important;
-        box-shadow: 0px 5px 15px rgba(0,0,0,0.3) !important;
+        border-radius: 20px;
+        border: 5px solid #1a202c;
+        box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+        z-index: 9999;
+        font-family: 'Arial Black', sans-serif;
     }
 
     .kiosk-title {
         color: white;
         text-align: center;
-        font-size: 50px !important;
+        font-size: 65px !important;
         font-weight: 900;
-        margin-top: 10px;
-        margin-bottom: 35px;
+        margin-top: 20px;
+        margin-bottom: 40px;
         font-family: 'Arial Black', sans-serif;
         text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
     }
 
-    /* THE UNIVERSAL KIOSK BUTTON: Reverting to exact original spacing and icon look */
-    div.stButton > button {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important; /* Left aligned like your link version */
+    /* THE UNIVERSAL KIOSK BUTTON: Reverting to exact pill style from screenshot */
+    .kiosk-link {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         background-color: white !important;
         color: black !important;
-        padding-left: 40px !important;
+        text-decoration: none !important;
+        padding: 0 40px;
         font-size: 42px !important;
         font-weight: 900 !important;
         min-height: 140px !important;
         width: 100% !important;
-        border-radius: 40px !important;
-        border: 8px solid #1a202c !important;
-        margin-bottom: 25px !important;
-        box-shadow: 0px 10px 25px rgba(0,0,0,0.4) !important;
-        font-family: 'Arial Black', sans-serif !important;
-        text-align: left !important;
+        border-radius: 80px; /* Pill shape from your image */
+        border: 10px solid #1a202c;
+        margin-bottom: 30px;
+        box-shadow: 0px 12px 0px #1a202c; /* Shadow matching your image */
+        font-family: 'Arial Black', sans-serif;
     }
 
-    /* Hiding standard Streamlit UI */
+    .btn-icon {
+        font-size: 65px; 
+        margin-right: 30px;
+        flex-shrink: 0;
+    }
+
+    /* UI Cleanup */
     header, footer, #MainMenu, [data-testid="stHeader"] {visibility: hidden; display: none;}
     
     .instruction-text {
         color: white;
         text-align: center;
-        font-size: 45px;
+        font-size: 50px;
         font-weight: 900;
         margin-bottom: 30px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        font-family: 'Arial Black', sans-serif;
     }
 
-    /* WORKSHEET PREVIEW FRAME */
+    /* THE WORKSHEET FRAME */
     .worksheet-preview {
         background-color: white;
-        padding: 30px;
-        border-radius: 10px;
-        border: 8px solid #1a202c;
+        padding: 20px;
+        border-radius: 20px;
+        border: 10px solid #1a202c;
         margin-bottom: 30px;
         box-shadow: 0px 15px 30px rgba(0,0,0,0.5);
-    }
-    
-    /* Answer box for facts/riddles */
-    .answer-box {
-        background-color: #FFF;
-        color: black;
-        padding: 30px;
-        border-radius: 30px;
-        font-size: 40px;
-        font-weight: 900;
-        border: 8px solid #1a202c;
-        margin-bottom: 25px;
-        text-align: center;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. SESSION STATE (The Brain) ---
-if 'page' not in st.session_state: st.session_state.page = "home"
-if 'animal' not in st.session_state: st.session_state.animal = None
-if 'reveal' not in st.session_state: st.session_state.reveal = False
+# --- 2. NAVIGATION LOGIC ---
+params = st.query_params
+mode = params.get("mode")
+animal = params.get("animal")
+action = params.get("action")
 
-# --- 3. FLOATING BACK BUTTON ---
-if st.session_state.page != "home":
-    st.markdown('<div class="floating-back-container">', unsafe_allow_html=True)
-    if st.button("🏠 BACK", key="global_back"):
-        st.session_state.page = "home"
-        st.session_state.animal = None
-        st.session_state.reveal = False
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+# --- 3. THE BULLETPROOF BACK BUTTON ---
+# This uses a JavaScript reset to ensure the iPad always returns home
+if mode:
+    st.markdown("""
+        <a href="/" onclick="window.location.href='/'; return false;" class="floating-back" target="_self">🏠 BACK</a>
+    """, unsafe_allow_html=True)
 
-# --- 4. NAVIGATION ---
-
-# --- HOME PAGE ---
-if st.session_state.page == "home":
+# --- 4. HOME PAGE ---
+if not mode:
     st.markdown('<div class="kiosk-title">Current choice:</div>', unsafe_allow_html=True)
-    if st.button("🎨 A. Color Sheet Maker"):
-        st.session_state.page = "coloring"; st.rerun()
-    if st.button("🧩 B. Today's Puzzle"):
-        st.session_state.page = "puzzle"; st.rerun()
-    if st.button("💡 C. Fun Fact"):
-        st.session_state.page = "fact"; st.rerun()
-    if st.button("➕ D. Math Magic"):
-        st.session_state.page = "math"; st.rerun()
+    st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self"><span class="btn-icon">🎨</span> A. Color Sheet Maker</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=puzzle" class="kiosk-link" target="_self"><span class="btn-icon">🧩</span> B. Today\'s Puzzle</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">💡</span> C. Fun Fact</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self"><span class="btn-icon">➕</span> D. Math Magic</a>', unsafe_allow_html=True)
 
-# --- COLOR SHEET MAKER ---
-elif st.session_state.page == "coloring":
-    if st.session_state.animal is None:
+# --- 5. OPTION A: COLOR SHEET MAKER ---
+elif mode == "coloring":
+    if not animal:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
-        
-        # Split into two columns for the 14 animals
+        # 2-Column Layout for the 14 animals
         col1, col2 = st.columns(2)
+        
         animals = [
-            ("🦖 Dino", "Dino"), ("🦁 Lion", "Lion"), ("🐘 Elephant", "Elephant"), 
-            ("🦒 Giraffe", "Giraffe"), ("🐯 Tiger", "Tiger"), ("🦓 Zebra", "Zebra"), 
-            ("🐒 Monkey", "Monkey"), ("🦈 Shark", "Shark"), ("🐙 Octopus", "Octopus"), 
-            ("🐸 Frog", "Frog"), ("🐼 Panda", "Panda"), ("🐱 Cat", "Cat"), 
-            ("🐶 Dog", "Dog"), ("🐰 Rabbit", "Rabbit")
+            ("🦖", "Dino"), ("🦁", "Lion"), ("🐘", "Elephant"), ("🦒", "Giraffe"),
+            ("🐯", "Tiger"), ("🦓", "Zebra"), ("🐒", "Monkey"), ("🦈", "Shark"),
+            ("🐙", "Octopus"), ("🐸", "Frog"), ("🐼", "Panda"), ("🐱", "Cat"),
+            ("🐶", "Dog"), ("🐰", "Rabbit")
         ]
         
-        for i, (label, name) in enumerate(animals):
-            target_col = col1 if i % 2 == 0 else col2
-            if target_col.button(label):
-                st.session_state.animal = name
-                st.rerun()
+        for i, (icon, name) in enumerate(animals):
+            target = col1 if i % 2 == 0 else col2
+            target.markdown(f'<a href="/?mode=coloring&animal={name}" class="kiosk-link" target="_self" style="min-height:110px !important; font-size:30px !important; border-radius:50px;"><span class="btn-icon" style="font-size:45px;">{icon}</span> {name}</a>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="instruction-text">{st.session_state.animal} Color Sheet</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
+        # MAPPING
         dino_file = "Dinosaur adventure in a prehistoric world.jpg"
         img_urls = {
             "Dino": dino_file if os.path.exists(dino_file) else "https://img.icons8.com/ios/500/dinosaur.png",
@@ -171,18 +149,10 @@ elif st.session_state.page == "coloring":
         }
         
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        st.image(img_urls.get(st.session_state.animal), use_container_width=True)
+        st.image(img_urls.get(animal), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
-        if st.button("🖨️ PRINT NOW"):
-            st.success("Success! Pick it up at the desk.")
-
-# --- OTHER PAGES ---
-elif st.session_state.page == "puzzle":
-    st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
-    st.markdown('<div class="answer-box">What has hands but cannot clap?</div>', unsafe_allow_html=True)
-    if st.session_state.reveal:
-        st.markdown('<div class="answer-box" style="background-color:#FFD700;">Answer: A Clock! ⏰</div>', unsafe_allow_html=True)
-    else:
-        if st.button("🔍 SHOW ANSWER"):
-            st.session_state.reveal = True; st.rerun()
+        st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self" style="justify-content:center;"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
+        
+        if action == "print":
+            st.toast("🖨️ Sending to printer...", icon="🤖")
