@@ -111,8 +111,9 @@ mode = params.get("mode")
 animal = params.get("animal")
 action = params.get("action")
 
-# --- 3. FLOATING BACK BUTTON ---
+# --- 3. FLOATING BACK BUTTON (Updated for Worksheet Logic) ---
 if mode:
+    # On the final worksheet page, we need a hard link back to the root to clear animal selection
     st.markdown('<a href="/" class="floating-back" target="_self">🏠 BACK</a>', unsafe_allow_html=True)
 
 # --- 4. HOME PAGE ---
@@ -129,20 +130,19 @@ elif mode == "coloring":
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
         
         # 14 SELECTIONS
-        animals = [
-            ("🦖 Dino", "Dino"), ("🦁 Lion", "Lion"), ("🐘 Elephant", "Elephant"), 
-            ("🦒 Giraffe", "Giraffe"), ("🐯 Tiger", "Tiger"), ("🦓 Zebra", "Zebra"), 
-            ("🐒 Monkey", "Monkey"), ("🦈 Shark", "Shark"), ("🐙 Octopus", "Octopus"), 
-            ("🐸 Frog", "Frog"), ("🐼 Panda", "Panda"), ("🐱 Cat", "Cat"), 
-            ("🐶 Dog", "Dog"), ("🐰 Rabbit", "Rabbit")
+        animal_list = [
+            ("🦖", "Dino"), ("🦁", "Lion"), ("🐘", "Elephant"), 
+            ("🦒", "Giraffe"), ("🐯", "Tiger"), ("🦓", "Zebra"), 
+            ("🐒", "Monkey"), ("🦈", "Shark"), ("🐙", "Octopus"), 
+            ("🐸", "Frog"), ("🐼", "Panda"), ("🐱", "Cat"), 
+            ("🐶", "Dog"), ("🐰", "Rabbit")
         ]
         
-        for label, name in animals:
-            st.markdown(f'<a href="/?mode=coloring&animal={name}" class="kiosk-link" target="_self"><span class="btn-icon">{label[:2]}</span> {name}</a>', unsafe_allow_html=True)
+        for icon, name in animal_list:
+            st.markdown(f'<a href="/?mode=coloring&animal={name}" class="kiosk-link" target="_self"><span class="btn-icon">{icon}</span> {name}</a>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
-        # MAPPING & FILE CHECKING
         dino_file = "Dinosaur adventure in a prehistoric world.jpg"
         
         animal_imgs = {
@@ -163,18 +163,18 @@ elif mode == "coloring":
         }
         
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        # Safe display to prevent red error box
         target_img = animal_imgs.get(animal, "https://img.icons8.com/ios/500/image.png")
         st.image(target_img, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
+        # Action button
         st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
         
         if action == "print":
             st.toast("🖨️ Sending to printer...", icon="🤖")
             st.success("Success! Pick up your page at the desk.")
 
-# --- 6-8 (PUZZLE, MATH, FACT remain the same) ---
+# --- 6-8 (OTHER PAGES) ---
 elif mode == "puzzle":
     st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
     st.markdown('<div class="answer-box">What has hands but cannot clap?</div>', unsafe_allow_html=True)
