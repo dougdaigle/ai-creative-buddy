@@ -1,7 +1,8 @@
 import streamlit as st
+import random
 import time
 
-# --- 1. IPAD STYLING: PERMANENT SKY BLUE & FORCED BLACK TEXT ---
+# --- 1. IPAD STYLING: FLOATING BACK & WORKSHEET PREVIEW ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
@@ -38,22 +39,30 @@ st.markdown("""
         text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
     }
 
-    /* THE UNIVERSAL KIOSK BUTTON: Solid Black Text on White */
-    div.stButton > button {
+    /* THE UNIVERSAL KIOSK BUTTON */
+    .kiosk-link {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         background-color: white !important;
         color: black !important;
-        border-radius: 40px !important;
-        border: 8px solid #1a202c !important;
+        text-decoration: none !important;
+        padding: 0 40px;
         font-size: 42px !important;
         font-weight: 900 !important;
         min-height: 140px !important;
         width: 100% !important;
-        box-shadow: 0px 10px 25px rgba(0,0,0,0.4) !important;
-        font-family: 'Arial Black', sans-serif !important;
-        display: flex !important;
-        justify-content: flex-start !important;
-        padding-left: 40px !important;
-        margin-bottom: 25px !important;
+        border-radius: 40px;
+        border: 8px solid #1a202c;
+        margin-bottom: 25px;
+        box-shadow: 0px 10px 25px rgba(0,0,0,0.4);
+        font-family: 'Arial Black', sans-serif;
+    }
+
+    .btn-icon {
+        font-size: 65px; 
+        margin-right: 30px;
+        flex-shrink: 0;
     }
 
     /* UI Cleanup */
@@ -68,79 +77,102 @@ st.markdown("""
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
-    /* WORKSHEET PREVIEW BOX */
+    /* WORKSHEET PREVIEW FRAME */
     .worksheet-preview {
         background-color: white;
-        padding: 20px;
-        border-radius: 15px;
+        padding: 30px;
+        border-radius: 10px;
         border: 8px solid #1a202c;
         margin-bottom: 30px;
         box-shadow: 0px 15px 30px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .answer-box {
+        background-color: #FFF;
+        color: black;
+        padding: 30px;
+        border-radius: 30px;
+        font-size: 40px;
+        font-weight: 900;
+        border: 8px solid #1a202c;
+        margin-bottom: 25px;
+        text-align: center;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. SESSION STATE (The Navigation Brain) ---
-if 'page' not in st.session_state: st.session_state.page = "home"
-if 'animal' not in st.session_state: st.session_state.animal = None
+# --- 2. NAVIGATION LOGIC ---
+params = st.query_params
+mode = params.get("mode")
+animal = params.get("animal")
+action = params.get("action")
 
 # --- 3. FLOATING BACK BUTTON ---
-if st.session_state.page != "home":
-    # Using a container and button for 100% reliability
-    st.markdown('<div class="floating-back">', unsafe_allow_html=True)
-    if st.button("🏠 BACK", key="global_back"):
-        st.session_state.page = "home"
-        st.session_state.animal = None
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+if mode:
+    st.markdown('<a href="/" class="floating-back" target="_self">🏠 BACK</a>', unsafe_allow_html=True)
 
-# --- 4. NAVIGATION PAGES ---
-
-# --- HOME PAGE ---
-if st.session_state.page == "home":
+# --- 4. HOME PAGE ---
+if not mode:
     st.markdown('<div class="kiosk-title">Current choice:</div>', unsafe_allow_html=True)
-    if st.button("🎨 A. Color Sheet Maker"):
-        st.session_state.page = "coloring"; st.rerun()
-    if st.button("🧩 B. Today's Puzzle"):
-        st.session_state.page = "puzzle"; st.rerun()
-    if st.button("💡 C. Fun Fact"):
-        st.session_state.page = "fact"; st.rerun()
-    if st.button("➕ D. Math Magic"):
-        st.session_state.page = "math"; st.rerun()
+    st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self"><span class="btn-icon">🎨</span> A. Color Sheet Maker</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=puzzle" class="kiosk-link" target="_self"><span class="btn-icon">🧩</span> B. Today\'s Puzzle</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">💡</span> C. Fun Fact</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self"><span class="btn-icon">➕</span> D. Math Magic</a>', unsafe_allow_html=True)
 
-# --- COLOR SHEET MAKER ---
-elif st.session_state.page == "coloring":
-    if st.session_state.animal is None:
+# --- 5. OPTION A: COLOR SHEET MAKER ---
+elif mode == "coloring":
+    if not animal:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
-        # Using columns for the list
-        c1, c2 = st.columns(2)
-        if c1.button("🦖 DINO"): st.session_state.animal = "Dino"; st.rerun()
-        if c2.button("🦁 LION"): st.session_state.animal = "Lion"; st.rerun()
-        if c1.button("🐘 ELEPHANT"): st.session_state.animal = "Elephant"; st.rerun()
-        if c2.button("🦒 GIRAFFE"): st.session_state.animal = "Giraffe"; st.rerun()
+        # Expanded Animal List using your style
+        st.markdown('<a href="/?mode=coloring&animal=Dino" class="kiosk-link" target="_self"><span class="btn-icon">🦖</span> Dino</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Lion" class="kiosk-link" target="_self"><span class="btn-icon">🦁</span> Lion</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Elephant" class="kiosk-link" target="_self"><span class="btn-icon">🐘</span> Elephant</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=coloring&animal=Giraffe" class="kiosk-link" target="_self"><span class="btn-icon">🦒</span> Giraffe</a>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="instruction-text">{st.session_state.animal} Color Sheet</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
-        # Mapping for coloring sheets
+        # Images for the preview
         animal_imgs = {
-            "Dino": "https://raw.githubusercontent.com/username/repo/main/Dino_Adventure.jpg", # Replace with your actual image URL
+            "Dino": "Dinosaur adventure in a prehistoric world.jpg",
             "Lion": "https://img.icons8.com/ios/500/lion.png",
             "Elephant": "https://img.icons8.com/ios/500/elephant.png",
             "Giraffe": "https://img.icons8.com/ios/500/giraffe.png"
         }
         
-        # NOTE: For the local 'Dinosaur adventure' image, ensure it is in the same folder as the app
-        # and replace the "Dino" URL above with "Dinosaur adventure in a prehistoric world.jpg"
-        
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        # Use local file if it exists, otherwise use fallback
-        try:
-            st.image("Dinosaur adventure in a prehistoric world.jpg", use_container_width=True)
-        except:
-            st.image(animal_imgs.get(st.session_state.animal), use_container_width=True)
+        st.image(animal_imgs.get(animal), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
-        if st.button("🖨️ PRINT NOW"):
+        st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
+        
+        if action == "print":
             st.toast("🖨️ Sending to printer...", icon="🤖")
+            st.success("Success! Pick up your page at the desk.")
 
-# (Other logic for Puzzle/Math/Fact remains here)
+# --- 6. OPTION B: TODAY'S PUZZLE ---
+elif mode == "puzzle":
+    st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
+    st.markdown('<div class="answer-box">What has hands but cannot clap?</div>', unsafe_allow_html=True)
+    
+    if action == "reveal":
+        st.markdown('<div class="answer-box" style="background-color:#FFD700;">Answer: A Clock! ⏰</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<a href="/?mode=puzzle&action=reveal" class="kiosk-link" target="_self"><span class="btn-icon">🔍</span> SHOW ANSWER</a>', unsafe_allow_html=True)
+
+# --- 7. OPTION D: MATH MAGIC ---
+elif mode == "math":
+    st.markdown('<div class="instruction-text">➕ Math Magic!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="answer-box" style="font-size:80px !important;">5 + 5 = ?</div>', unsafe_allow_html=True)
+    
+    if action == "reveal":
+        st.markdown('<div class="answer-box" style="background-color:#FFD700; font-size:80px !important;">10! 🌟</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<a href="/?mode=math&action=reveal" class="kiosk-link" target="_self"><span class="btn-icon">🤔</span> CHECK ANSWER</a>', unsafe_allow_html=True)
+
+# --- 8. OPTION C: FUN FACT ---
+elif mode == "fact":
+    st.markdown('<div class="instruction-text">💡 Fun Fact!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="answer-box">Octopuses have three hearts and blue blood! 🐙</div>', unsafe_allow_html=True)
