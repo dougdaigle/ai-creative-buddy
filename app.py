@@ -1,9 +1,7 @@
 import streamlit as st
-import random
-import time
 import os
 
-# --- 1. IPAD STYLING: FLOATING BACK & WORKSHEET PREVIEW ---
+# --- 1. IPAD STYLING: PERMANENT SKY BLUE ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
@@ -40,7 +38,7 @@ st.markdown("""
         text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
     }
 
-    /* THE UNIVERSAL KIOSK BUTTON */
+    /* THE UNIVERSAL KIOSK BUTTON (2-Column Size) */
     .kiosk-link {
         display: flex;
         align-items: center;
@@ -48,23 +46,19 @@ st.markdown("""
         background-color: white !important;
         color: black !important;
         text-decoration: none !important;
-        padding: 0 40px;
-        font-size: 42px !important;
+        padding: 0 20px;
+        font-size: 28px !important; /* Adjusted for 2-column fit */
         font-weight: 900 !important;
-        min-height: 140px !important;
+        min-height: 110px !important;
         width: 100% !important;
-        border-radius: 40px;
-        border: 8px solid #1a202c;
-        margin-bottom: 25px;
-        box-shadow: 0px 10px 25px rgba(0,0,0,0.4);
+        border-radius: 30px;
+        border: 6px solid #1a202c;
+        margin-bottom: 20px;
+        box-shadow: 0px 8px 15px rgba(0,0,0,0.3);
         font-family: 'Arial Black', sans-serif;
     }
 
-    .btn-icon {
-        font-size: 65px; 
-        margin-right: 30px;
-        flex-shrink: 0;
-    }
+    .btn-icon { font-size: 45px; margin-right: 15px; flex-shrink: 0; }
 
     /* UI Cleanup */
     header, footer, #MainMenu, [data-testid="stHeader"] {visibility: hidden; display: none;}
@@ -81,7 +75,7 @@ st.markdown("""
     /* WORKSHEET PREVIEW FRAME */
     .worksheet-preview {
         background-color: white;
-        padding: 30px;
+        padding: 25px;
         border-radius: 10px;
         border: 8px solid #1a202c;
         margin-bottom: 30px;
@@ -111,35 +105,36 @@ mode = params.get("mode")
 animal = params.get("animal")
 action = params.get("action")
 
-# --- 3. FLOATING BACK BUTTON (Updated for Worksheet Logic) ---
+# --- 3. HARD-RESET BACK BUTTON ---
+# This forces the app to reload at the root URL, clearing all parameters
 if mode:
-    # On the final worksheet page, we need a hard link back to the root to clear animal selection
     st.markdown('<a href="/" class="floating-back" target="_self">🏠 BACK</a>', unsafe_allow_html=True)
 
 # --- 4. HOME PAGE ---
 if not mode:
     st.markdown('<div class="kiosk-title">Current choice:</div>', unsafe_allow_html=True)
-    st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self"><span class="btn-icon">🎨</span> A. Color Sheet Maker</a>', unsafe_allow_html=True)
-    st.markdown('<a href="/?mode=puzzle" class="kiosk-link" target="_self"><span class="btn-icon">🧩</span> B. Today\'s Puzzle</a>', unsafe_allow_html=True)
-    st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self"><span class="btn-icon">💡</span> C. Fun Fact</a>', unsafe_allow_html=True)
-    st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self"><span class="btn-icon">➕</span> D. Math Magic</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=coloring" class="kiosk-link" target="_self" style="font-size:38px !important; min-height:140px !important;"><span class="btn-icon">🎨</span> A. Color Sheet Maker</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=puzzle" class="kiosk-link" target="_self" style="font-size:38px !important; min-height:140px !important;"><span class="btn-icon">🧩</span> B. Today\'s Puzzle</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=fact" class="kiosk-link" target="_self" style="font-size:38px !important; min-height:140px !important;"><span class="btn-icon">💡</span> C. Fun Fact</a>', unsafe_allow_html=True)
+    st.markdown('<a href="/?mode=math" class="kiosk-link" target="_self" style="font-size:38px !important; min-height:140px !important;"><span class="btn-icon">➕</span> D. Math Magic</a>', unsafe_allow_html=True)
 
 # --- 5. OPTION A: COLOR SHEET MAKER ---
 elif mode == "coloring":
     if not animal:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
         
-        # 14 SELECTIONS
-        animal_list = [
-            ("🦖", "Dino"), ("🦁", "Lion"), ("🐘", "Elephant"), 
-            ("🦒", "Giraffe"), ("🐯", "Tiger"), ("🦓", "Zebra"), 
-            ("🐒", "Monkey"), ("🦈", "Shark"), ("🐙", "Octopus"), 
-            ("🐸", "Frog"), ("🐼", "Panda"), ("🐱", "Cat"), 
+        # 14 Animals in 2 Columns
+        animals = [
+            ("🦖", "Dino"), ("🦁", "Lion"), ("🐘", "Elephant"), ("🦒", "Giraffe"),
+            ("🐯", "Tiger"), ("🦓", "Zebra"), ("🐒", "Monkey"), ("🦈", "Shark"),
+            ("🐙", "Octopus"), ("🐸", "Frog"), ("🐼", "Panda"), ("🐱", "Cat"),
             ("🐶", "Dog"), ("🐰", "Rabbit")
         ]
         
-        for icon, name in animal_list:
-            st.markdown(f'<a href="/?mode=coloring&animal={name}" class="kiosk-link" target="_self"><span class="btn-icon">{icon}</span> {name}</a>', unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        for i, (icon, name) in enumerate(animals):
+            target_col = col1 if i % 2 == 0 else col2
+            target_col.markdown(f'<a href="/?mode=coloring&animal={name}" class="kiosk-link" target="_self"><span class="btn-icon">{icon}</span> {name}</a>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
@@ -163,25 +158,23 @@ elif mode == "coloring":
         }
         
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        target_img = animal_imgs.get(animal, "https://img.icons8.com/ios/500/image.png")
-        st.image(target_img, use_container_width=True)
+        st.image(animal_imgs.get(animal), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Action button
-        st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self" style="font-size:38px !important; min-height:140px !important;"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
         
         if action == "print":
             st.toast("🖨️ Sending to printer...", icon="🤖")
-            st.success("Success! Pick up your page at the desk.")
+            st.success("Success! Pick it up at the desk.")
 
-# --- 6-8 (OTHER PAGES) ---
+# --- 6-8 (PUZZLE, MATH, FACT remain the same) ---
 elif mode == "puzzle":
     st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
     st.markdown('<div class="answer-box">What has hands but cannot clap?</div>', unsafe_allow_html=True)
     if action == "reveal":
         st.markdown('<div class="answer-box" style="background-color:#FFD700;">Answer: A Clock! ⏰</div>', unsafe_allow_html=True)
     else:
-        st.markdown('<a href="/?mode=puzzle&action=reveal" class="kiosk-link" target="_self"><span class="btn-icon">🔍</span> SHOW ANSWER</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=puzzle&action=reveal" class="kiosk-link" target="_self" style="font-size:38px !important; min-height:140px !important;"><span class="btn-icon">🔍</span> SHOW ANSWER</a>', unsafe_allow_html=True)
 
 elif mode == "math":
     st.markdown('<div class="instruction-text">➕ Math Magic!</div>', unsafe_allow_html=True)
@@ -189,7 +182,7 @@ elif mode == "math":
     if action == "reveal":
         st.markdown('<div class="answer-box" style="background-color:#FFD700; font-size:80px !important;">10! 🌟</div>', unsafe_allow_html=True)
     else:
-        st.markdown('<a href="/?mode=math&action=reveal" class="kiosk-link" target="_self"><span class="btn-icon">🤔</span> CHECK ANSWER</a>', unsafe_allow_html=True)
+        st.markdown('<a href="/?mode=math&action=reveal" class="kiosk-link" target="_self" style="font-size:38px !important; min-height:140px !important;"><span class="btn-icon">🤔</span> CHECK ANSWER</a>', unsafe_allow_html=True)
 
 elif mode == "fact":
     st.markdown('<div class="instruction-text">💡 Fun Fact!</div>', unsafe_allow_html=True)
