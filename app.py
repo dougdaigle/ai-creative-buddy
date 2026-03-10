@@ -1,4 +1,4 @@
-import streamlit st
+import streamlit as st
 import random
 import time
 import os
@@ -129,24 +129,20 @@ elif mode == "coloring":
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
         
         # 14 SELECTIONS
-        st.markdown('<a href="/?mode=coloring&animal=Dino" class="kiosk-link" target="_self"><span class="btn-icon">🦖</span> Dino</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Lion" class="kiosk-link" target="_self"><span class="btn-icon">🦁</span> Lion</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Elephant" class="kiosk-link" target="_self"><span class="btn-icon">🐘</span> Elephant</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Giraffe" class="kiosk-link" target="_self"><span class="btn-icon">🦒</span> Giraffe</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Tiger" class="kiosk-link" target="_self"><span class="btn-icon">🐯</span> Tiger</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Zebra" class="kiosk-link" target="_self"><span class="btn-icon">🦓</span> Zebra</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Monkey" class="kiosk-link" target="_self"><span class="btn-icon">🐒</span> Monkey</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Shark" class="kiosk-link" target="_self"><span class="btn-icon">🦈</span> Shark</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Octopus" class="kiosk-link" target="_self"><span class="btn-icon">🐙</span> Octopus</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Frog" class="kiosk-link" target="_self"><span class="btn-icon">🐸</span> Frog</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Panda" class="kiosk-link" target="_self"><span class="btn-icon">🐼</span> Panda</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Cat" class="kiosk-link" target="_self"><span class="btn-icon">🐱</span> Cat</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Dog" class="kiosk-link" target="_self"><span class="btn-icon">🐶</span> Dog</a>', unsafe_allow_html=True)
-        st.markdown('<a href="/?mode=coloring&animal=Rabbit" class="kiosk-link" target="_self"><span class="btn-icon">🐰</span> Rabbit</a>', unsafe_allow_html=True)
+        animals = [
+            ("🦖 Dino", "Dino"), ("🦁 Lion", "Lion"), ("🐘 Elephant", "Elephant"), 
+            ("🦒 Giraffe", "Giraffe"), ("🐯 Tiger", "Tiger"), ("🦓 Zebra", "Zebra"), 
+            ("🐒 Monkey", "Monkey"), ("🦈 Shark", "Shark"), ("🐙 Octopus", "Octopus"), 
+            ("🐸 Frog", "Frog"), ("🐼 Panda", "Panda"), ("🐱 Cat", "Cat"), 
+            ("🐶 Dog", "Dog"), ("🐰 Rabbit", "Rabbit")
+        ]
+        
+        for label, name in animals:
+            st.markdown(f'<a href="/?mode=coloring&animal={name}" class="kiosk-link" target="_self"><span class="btn-icon">{label[:2]}</span> {name}</a>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
-        # Safe File Handling for the custom Dino image
+        # MAPPING & FILE CHECKING
         dino_file = "Dinosaur adventure in a prehistoric world.jpg"
         
         animal_imgs = {
@@ -178,7 +174,7 @@ elif mode == "coloring":
             st.toast("🖨️ Sending to printer...", icon="🤖")
             st.success("Success! Pick up your page at the desk.")
 
-# --- 6-8 (PUZZLE, MATH, FACT are identical to previous) ---
+# --- 6-8 (PUZZLE, MATH, FACT remain the same) ---
 elif mode == "puzzle":
     st.markdown('<div class="instruction-text">🧩 Today\'s Riddle</div>', unsafe_allow_html=True)
     st.markdown('<div class="answer-box">What has hands but cannot clap?</div>', unsafe_allow_html=True)
