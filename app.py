@@ -127,17 +127,18 @@ elif mode == "coloring":
     else:
         st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
-        # MAPPING: Using local files for Dino, Cat, and Elephant
+        # MAPPING: Local file paths
         dino_file = "Dinosaur adventure in a prehistoric world.jpg"
         cat_file = "cat.png"
         elephant_file = "elephant.png"
+        giraffe_file = "giraffe.png"
 
         animal_imgs = {
             "Dino": dino_file if os.path.exists(dino_file) else "https://img.icons8.com/ios/500/dinosaur.png",
             "Cat": cat_file if os.path.exists(cat_file) else "https://img.icons8.com/ios/500/cat.png",
             "Elephant": elephant_file if os.path.exists(elephant_file) else "https://img.icons8.com/ios/500/elephant.png",
+            "Giraffe": giraffe_file if os.path.exists(giraffe_file) else "https://img.icons8.com/ios/500/giraffe.png",
             "Lion": "https://img.icons8.com/ios/500/lion.png",
-            "Giraffe": "https://img.icons8.com/ios/500/giraffe.png",
             "Tiger": "https://img.icons8.com/ios/500/tiger-side-view.png",
             "Zebra": "https://img.icons8.com/ios/500/zebra.png",
             "Monkey": "https://img.icons8.com/ios/500/monkey.png",
