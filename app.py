@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 
-# --- 1. IPAD STYLING: REVERTED TO EXACT ORIGINAL PILL LOOK ---
+# --- 1. IPAD STYLING: EXACT ORIGINAL PILL LOOK ---
 st.set_page_config(page_title="My Creative Buddy", layout="centered")
 
 st.markdown("""
@@ -38,7 +38,7 @@ st.markdown("""
         text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
     }
 
-    /* THE UNIVERSAL KIOSK BUTTON: Reverting to exact pill style from screenshot */
+    /* THE UNIVERSAL KIOSK BUTTON: Pill Style */
     .kiosk-link {
         display: flex;
         align-items: center;
@@ -51,10 +51,10 @@ st.markdown("""
         font-weight: 900 !important;
         min-height: 140px !important;
         width: 100% !important;
-        border-radius: 80px; /* Pill shape from your image */
+        border-radius: 80px;
         border: 10px solid #1a202c;
         margin-bottom: 30px;
-        box-shadow: 0px 12px 0px #1a202c; /* Shadow matching your image */
+        box-shadow: 0px 12px 0px #1a202c;
         font-family: 'Arial Black', sans-serif;
     }
 
@@ -95,7 +95,6 @@ animal = params.get("animal")
 action = params.get("action")
 
 # --- 3. THE BULLETPROOF BACK BUTTON ---
-# This uses a JavaScript reset to ensure the iPad always returns home
 if mode:
     st.markdown("""
         <a href="/" onclick="window.location.href='/'; return false;" class="floating-back" target="_self">🏠 BACK</a>
@@ -113,7 +112,6 @@ if not mode:
 elif mode == "coloring":
     if not animal:
         st.markdown('<div class="instruction-text">Pick an animal!</div>', unsafe_allow_html=True)
-        # 2-Column Layout for the 14 animals
         col1, col2 = st.columns(2)
         
         animals = [
@@ -129,12 +127,16 @@ elif mode == "coloring":
     else:
         st.markdown(f'<div class="instruction-text">{animal} Color Sheet</div>', unsafe_allow_html=True)
         
-        # MAPPING
+        # MAPPING: Using local files for Dino, Cat, and Elephant
         dino_file = "Dinosaur adventure in a prehistoric world.jpg"
-        img_urls = {
+        cat_file = "cat.png"
+        elephant_file = "elephant.png"
+
+        animal_imgs = {
             "Dino": dino_file if os.path.exists(dino_file) else "https://img.icons8.com/ios/500/dinosaur.png",
+            "Cat": cat_file if os.path.exists(cat_file) else "https://img.icons8.com/ios/500/cat.png",
+            "Elephant": elephant_file if os.path.exists(elephant_file) else "https://img.icons8.com/ios/500/elephant.png",
             "Lion": "https://img.icons8.com/ios/500/lion.png",
-            "Elephant": "https://img.icons8.com/ios/500/elephant.png",
             "Giraffe": "https://img.icons8.com/ios/500/giraffe.png",
             "Tiger": "https://img.icons8.com/ios/500/tiger-side-view.png",
             "Zebra": "https://img.icons8.com/ios/500/zebra.png",
@@ -143,13 +145,12 @@ elif mode == "coloring":
             "Octopus": "https://img.icons8.com/ios/500/octopus.png",
             "Frog": "https://img.icons8.com/ios/500/frog.png",
             "Panda": "https://img.icons8.com/ios/500/panda.png",
-            "Cat": "https://img.icons8.com/ios/500/cat.png",
             "Dog": "https://img.icons8.com/ios/500/dog.png",
             "Rabbit": "https://img.icons8.com/ios/500/rabbit.png"
         }
         
         st.markdown('<div class="worksheet-preview">', unsafe_allow_html=True)
-        st.image(img_urls.get(animal), use_container_width=True)
+        st.image(animal_imgs.get(animal), use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown(f'<a href="/?mode=coloring&animal={animal}&action=print" class="kiosk-link" target="_self" style="justify-content:center;"><span class="btn-icon">🖨️</span> PRINT NOW</a>', unsafe_allow_html=True)
